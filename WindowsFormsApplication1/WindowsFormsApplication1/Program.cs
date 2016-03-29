@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.Serialization.Json;
+using System.IO;
+using WindowsFormsApplication1.Properties;
+using System.Reflection;
 
 namespace WindowsFormsApplication1
 {
@@ -16,7 +21,7 @@ namespace WindowsFormsApplication1
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new MainForm());
         }
     }
 }
