@@ -73,6 +73,11 @@ namespace WindowsFormsApplication1
         public bool starter { get; set; }
         public string watermark { get; set; }
         public bool timeshifted { get; set; }
+
+        public override string ToString()
+        {
+            return name;
+        }
     }
 
 }
