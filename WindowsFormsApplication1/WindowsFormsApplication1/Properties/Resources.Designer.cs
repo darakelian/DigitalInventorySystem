@@ -69,5 +69,15 @@ namespace DigitalInventory.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap senior_pic {
+            get {
+                object obj = ResourceManager.GetObject("senior pic", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

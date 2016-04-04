@@ -27,17 +27,21 @@ namespace DigitalInventory
             {
                 using (var reader = new StreamReader(stream))
                 {
-                    HashSet<string> cardHash = new HashSet<string>();
-                    Dictionary<string, string[]> setDictionary = new Dictionary<string, string[]>();
+                    HashSet<string> cardHash = new HashSet<string>(); //Hash of each unique card name
+                    Dictionary<string, string[]> setDictionary = new Dictionary<string, string[]>(); //Dictionary of set code and the card names in each set
+                    Dictionary<string, int> multiverseDictionary = new Dictionary<string, int>();
+                    Dictionary<string, string[]> mciDictionary = new Dictionary<string, string[]>();
+                    List<string> cards = new List<string>();
+
                     string json = reader.ReadToEnd();
                     List<SetInfo> sets = JsonConvert.DeserializeObject<List<SetInfo>>(json);
-                    List<string> cards = new List<string>();
+
                     if (sets != null)
                     {
                         foreach (SetInfo set in sets)
                         {
-                            string setCode = set.code;
-                            string[] _cards = new string[set.cards.Length];
+                            string setCode = set.code; //Uppercase 3-4 character code of set
+                            string[] _cards = new string[set.cards.Length]; //Array of card names in set
                             for(int i = 0; i < set.cards.Length; i++)
                             {
                                 Card card = set.cards[i];
@@ -45,14 +49,14 @@ namespace DigitalInventory
                                 cardHash.Add(card.name);
                                 _cards[i] = card.name;
                             }
-                            setDictionary.Add(setCode.ToLower(), _cards);
+                            setDictionary.Add(setCode, _cards);
                         }
                         this.cardNameToAdd.AutoCompleteMode = AutoCompleteMode.Suggest;
                         this.cardNameToAdd.AutoCompleteSource = AutoCompleteSource.CustomSource;
                         AutoCompleteStringCollection acsc = new AutoCompleteStringCollection();
                         acsc.AddRange(cards.ToArray());
                         this.cardNameToAdd.AutoCompleteCustomSource = acsc;
-                        helper = new SetDataHelper(cardHash, setDictionary);
+                        helper = new SetDataHelper(cardHash, setDictionary, multiverseDictionary);
                     }
                 }
             }
@@ -142,12 +146,13 @@ namespace DigitalInventory
                 string name = "";
                 foreach (string s in cardTokens)
                 {
-                    //If the token is a number, it is the quantity
+                    //If the token is a number, it is the quantity or set code
                     if (Regex.IsMatch(s, @"\d"))
                     {
                         string numVal = s;
-                        if (numVal.ToLower().IndexOfAny(new char[] { '(', ')', '[', ']'}) != -1)
+                        if (numVal.ToLower().IndexOfAny(new char[] { '(', ')', '[', ']'}) != -1) //Set code with number
                         {
+                            set = helper.parseBracketTagAsSet(s);
                             continue;
                         }
                         if (numVal.ToLower().Contains("x"))
@@ -156,17 +161,16 @@ namespace DigitalInventory
                         }
                         quant = Convert.ToInt32(numVal);
                     }
-                    else if (s.Contains("[") || s.Contains("("))
+                    else if (s.Contains("[") || s.Contains("(")) //Either set or condition
                     {
-                        string conditionOrSet = s.Contains("[") ? s.Trim(new char[] {'[', ']'}) : s.Trim(new char[] { '(', ')' });
-                        conditionOrSet = conditionOrSet.ToLower();
-                        if (conditionOrSet.Equals("nm") || conditionOrSet.Equals("lp") || conditionOrSet.Equals("mp") || conditionOrSet.Equals("hp"))
+                        string tag = helper.parseBracketTag(s);
+                        if (tag.Equals("nm") || tag.Equals("lp") || tag.Equals("mp") || tag.Equals("hp"))
                         {
-                            condition = conditionOrSet.ToUpper();
+                            condition = tag.ToUpper();
                         }
                         else
                         {
-                            set = conditionOrSet.ToUpper();
+                            set = tag.ToUpper();
                         }
                     }
                     else
@@ -188,13 +192,17 @@ namespace DigitalInventory
                     Console.WriteLine("Card doesn't exist, tried looking for {0}", name);
                     continue;
                 }
-                set = helper.getDefaultSet(name);
+                //set = helper.getDefaultSet(name);
+                if (set == null)
+                {
+                    set = helper.getDefaultSet(name);
+                }
                 if (set != null)
                 {
                     //Set doesn't even exist
                     if (helper.getSetForCode(set) == null) {
                         importErrorFlag = true;
-                        Console.WriteLine("Set code invalid");
+                        Console.WriteLine("Set code invalid, set {0}", set);
                         continue;
                     }
                     //Card was not in the set specified
@@ -240,6 +248,7 @@ namespace DigitalInventory
             if (dgv.CurrentRow.Selected)
             {
                 Console.WriteLine("Clicked a selected row");
+                Console.WriteLine(dgv.CurrentRow.Cells[0]);
                 //If we clicked on the condition cell
                 //string cardName = (string)dgv.CurrentRow.Cells[0].Value;
                 //this.cardNameLabel1.Text = cardName;

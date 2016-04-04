@@ -10,11 +10,13 @@ namespace DigitalInventory
     {
         private HashSet<string> cards;
         private Dictionary<string, string[]> setDictionary;
+        private Dictionary<string, int> multiverseDictionary;
 
-        public SetDataHelper(HashSet<string> cards, Dictionary<string, string[]> setDictionary)
+        public SetDataHelper(HashSet<string> cards, Dictionary<string, string[]> setDictionary, Dictionary<string, int> multiverseDictionary)
         {
             this.cards = cards;
             this.setDictionary = setDictionary;
+            this.multiverseDictionary = multiverseDictionary;
         }
 
         public bool cardExists(string card)
@@ -43,7 +45,7 @@ namespace DigitalInventory
         {
             try
             {
-                return setDictionary[code.ToLower()];
+                return setDictionary[code.ToUpper()];
             }
             catch (KeyNotFoundException)
             {
@@ -53,13 +55,6 @@ namespace DigitalInventory
 
         public string getDefaultSet(string name)
         {
-            /*foreach (SetInfo set in sets)
-            {
-                if (cardInSet(name, set.code))
-                {
-                    return set.code;
-                }
-            }*/
             string[] sets = setDictionary.Keys.ToArray();
             foreach (string set in sets)
             {
@@ -69,6 +64,37 @@ namespace DigitalInventory
                 }
             }
             return "TST";
+        }
+
+        public int getIdForNameSet(string name)
+        {
+            return getIdForNameSet(name, getDefaultSet(name));
+        }
+
+        public int getIdForNameSet(string name, string set)
+        {
+            try
+            {
+                return multiverseDictionary[name + set];
+            }
+            catch (KeyNotFoundException)
+            {
+                return 1;
+            }
+        }
+
+        public string parseBracketTagAsSet(string s)
+        {
+            string conditionOrSet = s.Contains("[") ? s.Trim(new char[] { '[', ']' }) : s.Trim(new char[] { '(', ')' });
+            conditionOrSet = conditionOrSet.ToLower();
+            return conditionOrSet.ToUpper();
+        }
+
+        public string parseBracketTag(string s)
+        {
+            string conditionOrSet = s.Contains("[") ? s.Trim(new char[] { '[', ']' }) : s.Trim(new char[] { '(', ')' });
+            conditionOrSet = conditionOrSet.ToLower();
+            return conditionOrSet;
         }
     }
 }
