@@ -31,6 +31,11 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.cardNameLabel1 = new System.Windows.Forms.Label();
             this.inventoryGridView = new System.Windows.Forms.DataGridView();
+            this.cardName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cardSet = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cardQuantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cardCondition = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cardPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.quantitySelection = new System.Windows.Forms.NumericUpDown();
             this.quantityLabel = new System.Windows.Forms.Label();
             this.conditionSelection = new System.Windows.Forms.ComboBox();
@@ -53,11 +58,6 @@
             this.settingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shopInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pricingRulesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cardName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cardSet = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cardQuantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cardCondition = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.cardPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -100,7 +100,6 @@
             this.cardNameLabel1.Name = "cardNameLabel1";
             this.cardNameLabel1.Size = new System.Drawing.Size(255, 23);
             this.cardNameLabel1.TabIndex = 0;
-            this.cardNameLabel1.Text = "cardName_Panel";
             this.cardNameLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // inventoryGridView
@@ -110,6 +109,8 @@
             this.inventoryGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.inventoryGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.inventoryGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.inventoryGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.inventoryGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.cardName,
@@ -125,6 +126,41 @@
             this.inventoryGridView.Size = new System.Drawing.Size(492, 463);
             this.inventoryGridView.TabIndex = 7;
             this.inventoryGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.inventoryGridView_CellContentClick);
+            // 
+            // cardName
+            // 
+            this.cardName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.cardName.FillWeight = 300F;
+            this.cardName.HeaderText = "Name";
+            this.cardName.Name = "cardName";
+            this.cardName.ReadOnly = true;
+            // 
+            // cardSet
+            // 
+            this.cardSet.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.cardSet.HeaderText = "Set";
+            this.cardSet.Name = "cardSet";
+            this.cardSet.ReadOnly = true;
+            // 
+            // cardQuantity
+            // 
+            this.cardQuantity.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.cardQuantity.HeaderText = "Quantity";
+            this.cardQuantity.Name = "cardQuantity";
+            this.cardQuantity.ReadOnly = true;
+            // 
+            // cardCondition
+            // 
+            this.cardCondition.HeaderText = "Condition";
+            this.cardCondition.Name = "cardCondition";
+            this.cardCondition.ReadOnly = true;
+            // 
+            // cardPrice
+            // 
+            this.cardPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.cardPrice.HeaderText = "Price";
+            this.cardPrice.Name = "cardPrice";
+            this.cardPrice.ReadOnly = true;
             // 
             // quantitySelection
             // 
@@ -317,46 +353,6 @@
             this.pricingRulesToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.pricingRulesToolStripMenuItem.Text = "Pricing Rules";
             // 
-            // cardName
-            // 
-            this.cardName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.cardName.FillWeight = 300F;
-            this.cardName.HeaderText = "Name";
-            this.cardName.Name = "cardName";
-            this.cardName.ReadOnly = true;
-            // 
-            // cardSet
-            // 
-            this.cardSet.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.cardSet.HeaderText = "Set";
-            this.cardSet.Name = "cardSet";
-            this.cardSet.ReadOnly = true;
-            // 
-            // cardQuantity
-            // 
-            this.cardQuantity.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.cardQuantity.HeaderText = "Quantity";
-            this.cardQuantity.Name = "cardQuantity";
-            this.cardQuantity.ReadOnly = true;
-            // 
-            // cardCondition
-            // 
-            this.cardCondition.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.cardCondition.HeaderText = "Condition";
-            this.cardCondition.Items.AddRange(new object[] {
-            "NM",
-            "LP",
-            "MP",
-            "HP"});
-            this.cardCondition.Name = "cardCondition";
-            // 
-            // cardPrice
-            // 
-            this.cardPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.cardPrice.HeaderText = "Price";
-            this.cardPrice.Name = "cardPrice";
-            this.cardPrice.ReadOnly = true;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -387,7 +383,6 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TextBox cardNameToAdd;
         private System.Windows.Forms.Button addCardButton;
-        private System.Windows.Forms.Label cardNameLabel1;
         private System.Windows.Forms.ComboBox conditionSelection;
         private System.Windows.Forms.Label quantityLabel;
         private System.Windows.Forms.NumericUpDown quantitySelection;
@@ -412,8 +407,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn cardName;
         private System.Windows.Forms.DataGridViewTextBoxColumn cardSet;
         private System.Windows.Forms.DataGridViewTextBoxColumn cardQuantity;
-        private System.Windows.Forms.DataGridViewComboBoxColumn cardCondition;
+        private System.Windows.Forms.DataGridViewTextBoxColumn cardCondition;
         private System.Windows.Forms.DataGridViewTextBoxColumn cardPrice;
+        public System.Windows.Forms.Label cardNameLabel1;
     }
 }
 
