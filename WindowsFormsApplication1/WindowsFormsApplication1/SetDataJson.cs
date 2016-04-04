@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace WindowsFormsApplication1
+namespace DigitalInventory
 {
 
     public class SetInfo

@@ -11,14 +11,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsFormsApplication1
+namespace DigitalInventory
 {
     public partial class MainForm : Form
     {
-        public HashSet<string> cardHash = new HashSet<string>();
-        public List<string> cards;
-        //public HashSet<string> setListHash = new HashSet<string>();
-        public List<SetInfo> sets = new List<SetInfo>();
+        
+        private SetDataHelper helper;
+        //private DataTable table;
 
         public MainForm()
         {
@@ -28,26 +27,32 @@ namespace WindowsFormsApplication1
             {
                 using (var reader = new StreamReader(stream))
                 {
+                    HashSet<string> cardHash = new HashSet<string>();
+                    Dictionary<string, string[]> setDictionary = new Dictionary<string, string[]>();
                     string json = reader.ReadToEnd();
-                    sets = JsonConvert.DeserializeObject<List<SetInfo>>(json);
-                    cards = new List<string>();
+                    List<SetInfo> sets = JsonConvert.DeserializeObject<List<SetInfo>>(json);
+                    List<string> cards = new List<string>();
                     if (sets != null)
                     {
                         foreach (SetInfo set in sets)
                         {
                             string setCode = set.code;
-                            //setListHash.Add(setCode);
-                            foreach (Card card in set.cards)
+                            string[] _cards = new string[set.cards.Length];
+                            for(int i = 0; i < set.cards.Length; i++)
                             {
+                                Card card = set.cards[i];
                                 cards.Add(card.name + "-" + setCode);
                                 cardHash.Add(card.name);
+                                _cards[i] = card.name;
                             }
+                            setDictionary.Add(setCode.ToLower(), _cards);
                         }
                         this.cardNameToAdd.AutoCompleteMode = AutoCompleteMode.Suggest;
                         this.cardNameToAdd.AutoCompleteSource = AutoCompleteSource.CustomSource;
                         AutoCompleteStringCollection acsc = new AutoCompleteStringCollection();
                         acsc.AddRange(cards.ToArray());
                         this.cardNameToAdd.AutoCompleteCustomSource = acsc;
+                        helper = new SetDataHelper(cardHash, setDictionary);
                     }
                 }
             }
@@ -65,7 +70,7 @@ namespace WindowsFormsApplication1
                 string name = this.cardNameToAdd.Text;
                 name = name.Substring(0, name.LastIndexOf("-") < 0 ? 1 : name.LastIndexOf("-"));
                 string set = name.Substring(name.LastIndexOf("-") + 1);
-                if (cardHash.Contains(name)) //Add the card to inventory list
+                if (helper.cardExists(name)) //Add the card to inventory list
                 {
                     Console.WriteLine("Found card.");
                     addCardToListFromTextBox(this.cardNameToAdd.Text);
@@ -79,19 +84,23 @@ namespace WindowsFormsApplication1
             string set = cardname.Substring(cardname.LastIndexOf("-") + 1);
             int quantity = Decimal.ToInt32(quantitySelection.Value);
             string condition = conditionSelection.SelectedItem.ToString();
-            string price = getPrice(name);
-            inventoryGridView.Rows.Add(name, set, quantity, condition, price);
+            float price = getPrice(name);
+            inventoryDataSetBindingSource.EndEdit();
+            inventoryDataSet.Inventory.AddInventoryRow(name, set, quantity, condition, price);
+            inventoryTableAdapter.Update(inventoryDataSet.Inventory);
         }
 
         private void addCardToListFromClipboard(string cardname, string set, int quantity, string condition)
         {
-            string price = getPrice(cardname);
-            inventoryGridView.Rows.Add(cardname, set, quantity, condition, price);
+            float price = getPrice(cardname);
+            inventoryDataSetBindingSource.EndEdit();
+            inventoryDataSet.Inventory.AddInventoryRow(cardname, set, quantity, condition, price);
+            inventoryTableAdapter.Update(inventoryDataSet.Inventory);
         }
 
-        private string getPrice(string card)
+        private float getPrice(string card)
         {
-            return "$0.00";
+            return 2.00F;
         }
 
         private void clipboardImportMenuItem_Click(object sender, EventArgs e)
@@ -137,6 +146,10 @@ namespace WindowsFormsApplication1
                     if (Regex.IsMatch(s, @"\d"))
                     {
                         string numVal = s;
+                        if (numVal.ToLower().IndexOfAny(new char[] { '(', ')', '[', ']'}) != -1)
+                        {
+                            continue;
+                        }
                         if (numVal.ToLower().Contains("x"))
                         {
                             numVal = numVal.Replace("x", "");
@@ -169,28 +182,28 @@ namespace WindowsFormsApplication1
                 }
                 name = nameBuild.ToString().Trim(' ');
                 //Check if card exists
-                if (!cardHash.Contains(name))
+                if (!helper.cardExists(name))
                 {
                     importErrorFlag = true;
+                    Console.WriteLine("Card doesn't exist, tried looking for {0}", name);
                     continue;
                 }
+                set = helper.getDefaultSet(name);
                 if (set != null)
                 {
                     //Set doesn't even exist
-                    if (getSetForCode(set) == null) {
+                    if (helper.getSetForCode(set) == null) {
                         importErrorFlag = true;
+                        Console.WriteLine("Set code invalid");
                         continue;
                     }
                     //Card was not in the set specified
-                    if (!cardInSet(name, set))
+                    if (!helper.cardInSet(name, set))
                     {
                         importErrorFlag = true;
+                        Console.WriteLine("Card was not in set");
                         continue;
                     }
-                }
-                if (set == null)
-                {
-                    set = getDefaultSet(name);
                 }
                 addCardToListFromClipboard(name, set, quant, condition);
             }
@@ -199,46 +212,6 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("Error importing one or more cards.");
             }
             ClipboardTextForm.ActiveForm.Close();
-        }
-
-        private bool cardInSet(string name, string code)
-        {
-            SetInfo set = getSetForCode(code);
-            if (set == null)
-            {
-                return false;
-            }
-            foreach (Card card in set.cards)
-            {
-                if (card.name.ToLower().Equals(name.ToLower()))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        private SetInfo getSetForCode(string code)
-        {
-            foreach (SetInfo set in sets)
-            {
-                if (set.code.ToLower().Equals(code.ToLower()))
-                {
-                    return set;
-                }
-            }
-            return null;
-        }
-
-        private string getDefaultSet(string name)
-        {
-            foreach (SetInfo set in sets)
-            {
-                if (cardInSet(name, set.code))
-                {
-                    return set.code;
-                }
-            }
-            return "TST";
         }
 
         private string firstCharToUpper(string input)
@@ -253,7 +226,13 @@ namespace WindowsFormsApplication1
             clipboardImportMenuItem_Click(sender, e);
         }
 
-        private void inventoryGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            // TODO: This line of code loads data into the 'inventoryDataSet.Inventory' table. You can move, or remove it, as needed.
+            this.inventoryTableAdapter.Fill(this.inventoryDataSet.Inventory);
+        }
+
+        private void inventoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             DataGridView dgv = sender as DataGridView;
             if (dgv == null)
@@ -262,8 +241,8 @@ namespace WindowsFormsApplication1
             {
                 Console.WriteLine("Clicked a selected row");
                 //If we clicked on the condition cell
-                string cardName = (string)dgv.CurrentRow.Cells[0].Value;
-                this.cardNameLabel1.Text = cardName;
+                //string cardName = (string)dgv.CurrentRow.Cells[0].Value;
+                //this.cardNameLabel1.Text = cardName;
             }
         }
     }

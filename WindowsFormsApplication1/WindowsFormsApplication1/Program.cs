@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.Serialization.Json;
 using System.IO;
-using WindowsFormsApplication1.Properties;
 using System.Reflection;
 
-namespace WindowsFormsApplication1
+namespace DigitalInventory
 {
     static class Program
     {
