@@ -236,7 +236,6 @@ namespace DigitalInventory
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            // TODO: This line of code loads data into the 'inventoryDataSet.Inventory' table. You can move, or remove it, as needed.
             this.inventoryTableAdapter.Fill(this.inventoryDataSet.Inventory);
         }
 
