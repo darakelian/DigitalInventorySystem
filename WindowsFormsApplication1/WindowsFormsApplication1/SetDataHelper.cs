@@ -83,11 +83,9 @@ namespace DigitalInventory
             }
         }
 
-        public string parseBracketTagAsSet(string s)
+        public float getPrice(string card)
         {
-            string conditionOrSet = s.Contains("[") ? s.Trim(new char[] { '[', ']' }) : s.Trim(new char[] { '(', ')' });
-            conditionOrSet = conditionOrSet.ToLower();
-            return conditionOrSet.ToUpper();
+            return 2.00F;
         }
 
         public string parseBracketTag(string s)
