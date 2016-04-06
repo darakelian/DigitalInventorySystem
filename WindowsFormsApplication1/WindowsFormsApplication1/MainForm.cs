@@ -41,7 +41,7 @@ namespace DigitalInventory
                 string name = this.cardNameToAdd.Text;
                 name = name.Substring(0, name.LastIndexOf("-") < 0 ? 1 : name.LastIndexOf("-"));
                 string set = name.Substring(name.LastIndexOf("-") + 1);
-                if (helper.cardExists(name)) //Add the card to inventory list
+                if (helper.CardExists(name)) //Add the card to inventory list
                 {
                     Console.WriteLine("Found card.");
                     AddCardToListFromTextBox(this.cardNameToAdd.Text);
@@ -62,15 +62,30 @@ namespace DigitalInventory
             string condition = conditionSelection.SelectedItem.ToString();
             float price = helper.getPrice(name);
             inventoryDataSet.Inventory.AddInventoryRow(name, set, quantity, condition, price);
-            NotifySaveNeeded();
+            if (!saveNeeded)
+            {
+                NotifySaveNeeded();
+            }
             ResetCardParameters();
         }
 
         private void AddCardToListFromClipboard(string cardname, string set, int quantity, string condition)
         {
             float price = helper.getPrice(cardname);
+            //Check if database already contains a card, set, condition pair
+            IEnumerable<DataRow> rowsQuery =
+                from row in inventoryDataSet.Inventory.AsEnumerable()
+                where row.Name.Equals(cardname)
+                where row.Condition.Equals(condition)
+                where row.Set.Equals(set)
+                select row;
+            Console.WriteLine("There were {0} rows with the criteria matched.", rowsQuery.Count());
+
             inventoryDataSet.Inventory.AddInventoryRow(cardname, set, quantity, condition, price);
-            NotifySaveNeeded();
+            if (!saveNeeded)
+            {
+                NotifySaveNeeded();
+            }
         }
 
         private void clipboardImportMenuItem_Click(object sender, EventArgs e)
@@ -111,23 +126,11 @@ namespace DigitalInventory
                 foreach (string s in cardTokens)
                 {
                     //If the token is a number, it is the quantity or set code
-                    if (Regex.IsMatch(s, @"\d"))
+                    //Try and parse as a tag first
+                    if (Utils.IsSetOrCondition(s))
                     {
-                        string numVal = s;
-                        if (numVal.ToLower().IndexOfAny(new char[] { '(', ')', '[', ']'}) != -1) //Set code with number
-                        {
-                            set = helper.parseBracketTag(s);
-                            continue;
-                        }
-                        if (numVal.ToLower().Contains("x"))
-                        {
-                            numVal = numVal.Replace("x", "");
-                        }
-                        quant = Convert.ToInt32(numVal);
-                    }
-                    else if (Utils.IsSetOrCondition(s)) //Either set or condition
-                    {
-                        string tag = helper.parseBracketTag(s);
+                        //Check if tag is a condition tag
+                        string tag = Utils.ParseBracketTag(s).ToLower();
                         if (Utils.IsTagCondition(tag))
                         {
                             condition = tag.ToUpper();
@@ -137,7 +140,23 @@ namespace DigitalInventory
                             set = tag.ToUpper();
                         }
                     }
-                    else
+                    else if (Regex.IsMatch(s, @"\d")) //Check for quantity
+                    {
+                        string numVal = s;
+                        if (numVal.ToLower().Contains('x'))
+                        {
+                            numVal = numVal.Replace("x", "");
+                        }
+                        try
+                        {
+                            quant = Convert.ToInt32(numVal);
+                        }
+                        catch (ArgumentException)
+                        {
+                            quant = 1;
+                        }
+                    }
+                    else //Token must be part of name
                     {
                         nameFrags.Add(s);
                     }
@@ -150,7 +169,7 @@ namespace DigitalInventory
                 }
                 name = nameBuild.ToString().Trim(' ');
                 //Check if card exists
-                if (!helper.cardExists(name))
+                if (!helper.CardExists(name))
                 {
                     importErrorFlag = true;
                     Console.WriteLine("Card doesn't exist, tried looking for {0}", name);
@@ -159,18 +178,18 @@ namespace DigitalInventory
                 //set = helper.getDefaultSet(name);
                 if (set == null)
                 {
-                    set = helper.getDefaultSet(name);
+                    set = helper.DefaultSet(name);
                 }
-                if (set != null)
+                else
                 {
                     //Set doesn't even exist
-                    if (helper.getSetForCode(set) == null) {
+                    if (helper.SetForCode(set) == null) {
                         importErrorFlag = true;
                         Console.WriteLine("Set code invalid, set {0}", set);
                         continue;
                     }
                     //Card was not in the set specified
-                    if (!helper.cardInSet(name, set))
+                    if (!helper.CardInSet(name, set))
                     {
                         importErrorFlag = true;
                         Console.WriteLine("Card was not in set");
@@ -213,7 +232,7 @@ namespace DigitalInventory
                     {
                         foreach (SetInfo set in sets)
                         {
-                            string setCode = set.code; //Uppercase 3-4 character code of set
+                            string setCode = set.code.ToUpper(); //Uppercase 3-4 character code of set
                             string[] _cards = new string[set.cards.Length]; //Array of card names in set
                             for (int i = 0; i < set.cards.Length; i++)
                             {
@@ -300,6 +319,31 @@ namespace DigitalInventory
             cardNameToAdd.Text = "";
             conditionSelection.SelectedIndex = 0;
             quantitySelection.Value = 1;
+        }
+
+        /// <summary>
+        /// Copies database to clipboard
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DataTable table = inventoryDataSet.Inventory;
+            StringBuilder stringb = new StringBuilder();
+            foreach (DataRow row in table.Rows)
+            {
+                //for (int i = 1; i < row.ItemArray.Length; i++)
+                //{
+                //  object item = row.ItemArray[i];
+                //  stringb.Append(item.ToString() + " ");
+                //}
+                stringb.AppendFormat("{0} {1} {2} {3}", row.ItemArray[1].ToString().Trim(' '),
+                    "[" + row.ItemArray[2].ToString().Trim(' ') + "]", row.ItemArray[3].ToString().Trim(' '), 
+                    "[" + row.ItemArray[4].ToString().Trim(' ') + "]");
+                stringb.AppendLine();
+            }
+            Clipboard.Clear();
+            Clipboard.SetText(stringb.ToString());
         }
     }
 }

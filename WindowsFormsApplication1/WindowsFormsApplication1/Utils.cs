@@ -37,5 +37,12 @@ namespace DigitalInventory
                 throw new ArgumentException("ARGH!");
             return input.First().ToString().ToUpper() + input.Substring(1);
         }
+
+        public static string ParseBracketTag(string s)
+        {
+            string conditionOrSet = s.Contains("[") ? s.Trim(new char[] { '[', ']' }) : s.Trim(new char[] { '(', ')' });
+            conditionOrSet = conditionOrSet.ToUpper();
+            return conditionOrSet;
+        }
     }
 }

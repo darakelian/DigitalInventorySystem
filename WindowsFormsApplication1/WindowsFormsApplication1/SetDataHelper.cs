@@ -19,14 +19,14 @@ namespace DigitalInventory
             this.multiverseDictionary = multiverseDictionary;
         }
 
-        public bool cardExists(string card)
+        public bool CardExists(string card)
         {
             return cards.Contains(card);
         }
 
-        public bool cardInSet(string name, string code)
+        public bool CardInSet(string name, string code)
         {
-            string[] set = getSetForCode(code);
+            string[] set = SetForCode(code);
             if (set == null)
             {
                 return false;
@@ -41,7 +41,7 @@ namespace DigitalInventory
             return false;
         }
 
-        public string[] getSetForCode(string code)
+        public string[] SetForCode(string code)
         {
             try
             {
@@ -53,12 +53,12 @@ namespace DigitalInventory
             }
         }
 
-        public string getDefaultSet(string name)
+        public string DefaultSet(string name)
         {
             string[] sets = setDictionary.Keys.ToArray();
             foreach (string set in sets)
             {
-                if (cardInSet(name, set))
+                if (CardInSet(name, set))
                 {
                     return set.ToUpper();
                 }
@@ -66,12 +66,12 @@ namespace DigitalInventory
             return "TST";
         }
 
-        public int getIdForNameSet(string name)
+        public int IdForNameSet(string name)
         {
-            return getIdForNameSet(name, getDefaultSet(name));
+            return IdForNameSet(name, DefaultSet(name));
         }
 
-        public int getIdForNameSet(string name, string set)
+        public int IdForNameSet(string name, string set)
         {
             try
             {
@@ -88,11 +88,5 @@ namespace DigitalInventory
             return 2.00F;
         }
 
-        public string parseBracketTag(string s)
-        {
-            string conditionOrSet = s.Contains("[") ? s.Trim(new char[] { '[', ']' }) : s.Trim(new char[] { '(', ')' });
-            conditionOrSet = conditionOrSet.ToLower();
-            return conditionOrSet;
-        }
     }
 }
