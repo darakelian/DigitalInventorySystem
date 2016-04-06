@@ -22,47 +22,14 @@ namespace DigitalInventory
         public MainForm()
         {
             InitializeComponent();
-            //Load set data
-            using (var stream = new MemoryStream(Properties.Resources.AllSetsArray))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    HashSet<string> cardHash = new HashSet<string>(); //Hash of each unique card name
-                    Dictionary<string, string[]> setDictionary = new Dictionary<string, string[]>(); //Dictionary of set code and the card names in each set
-                    Dictionary<string, int> multiverseDictionary = new Dictionary<string, int>();
-                    Dictionary<string, string[]> mciDictionary = new Dictionary<string, string[]>();
-                    List<string> cards = new List<string>();
-
-                    string json = reader.ReadToEnd();
-                    List<SetInfo> sets = JsonConvert.DeserializeObject<List<SetInfo>>(json);
-
-                    if (sets != null)
-                    {
-                        foreach (SetInfo set in sets)
-                        {
-                            string setCode = set.code; //Uppercase 3-4 character code of set
-                            string[] _cards = new string[set.cards.Length]; //Array of card names in set
-                            for(int i = 0; i < set.cards.Length; i++)
-                            {
-                                Card card = set.cards[i];
-                                cards.Add(card.name + "-" + setCode);
-                                cardHash.Add(card.name);
-                                _cards[i] = card.name;
-                            }
-                            setDictionary.Add(setCode, _cards);
-                        }
-                        this.cardNameToAdd.AutoCompleteMode = AutoCompleteMode.Suggest;
-                        this.cardNameToAdd.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                        AutoCompleteStringCollection acsc = new AutoCompleteStringCollection();
-                        acsc.AddRange(cards.ToArray());
-                        this.cardNameToAdd.AutoCompleteCustomSource = acsc;
-                        helper = new SetDataHelper(cardHash, setDictionary, multiverseDictionary);
-                    }
-                }
-            }
-            
         }
 
+        /// <summary>
+        /// Called whenever the add button is clicked. Checks to see if there is
+        /// a valid card name entered in the texbbox.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addCardButton_Click(object sender, EventArgs e)
         {
             if (this.cardNameToAdd.Text.Length == 0)
@@ -77,34 +44,33 @@ namespace DigitalInventory
                 if (helper.cardExists(name)) //Add the card to inventory list
                 {
                     Console.WriteLine("Found card.");
-                    addCardToListFromTextBox(this.cardNameToAdd.Text);
+                    AddCardToListFromTextBox(this.cardNameToAdd.Text);
                 }
             }
         }
 
-        private void addCardToListFromTextBox(string cardname)
+        /// <summary>
+        /// If the card name was validated as being a real card, interpret data
+        /// about the card and then add it to the data base.
+        /// </summary>
+        /// <param name="cardname">The name of the card being added.</param>
+        private void AddCardToListFromTextBox(string cardname)
         {
             string name = cardname.Substring(0, cardname.LastIndexOf("-"));
             string set = cardname.Substring(cardname.LastIndexOf("-") + 1);
             int quantity = Decimal.ToInt32(quantitySelection.Value);
             string condition = conditionSelection.SelectedItem.ToString();
-            float price = getPrice(name);
-            inventoryDataSetBindingSource.EndEdit();
+            float price = helper.getPrice(name);
             inventoryDataSet.Inventory.AddInventoryRow(name, set, quantity, condition, price);
-            inventoryTableAdapter.Update(inventoryDataSet.Inventory);
+            NotifySaveNeeded();
+            ResetCardParameters();
         }
 
-        private void addCardToListFromClipboard(string cardname, string set, int quantity, string condition)
+        private void AddCardToListFromClipboard(string cardname, string set, int quantity, string condition)
         {
-            float price = getPrice(cardname);
-            inventoryDataSetBindingSource.EndEdit();
+            float price = helper.getPrice(cardname);
             inventoryDataSet.Inventory.AddInventoryRow(cardname, set, quantity, condition, price);
-            inventoryTableAdapter.Update(inventoryDataSet.Inventory);
-        }
-
-        private float getPrice(string card)
-        {
-            return 2.00F;
+            NotifySaveNeeded();
         }
 
         private void clipboardImportMenuItem_Click(object sender, EventArgs e)
@@ -137,8 +103,6 @@ namespace DigitalInventory
             foreach (string rawCardLine in rawCardsArray)
             {
                 string[] cardTokens = rawCardLine.Trim().Split(' ');
-                //List<string> cardTokens = new List<string>();
-                //cardTokens.AddRange(rawCardLine.Trim().Split(' '));
                 List<string> nameFrags = new List<string>();
                 int quant = 1;
                 string set = null;
@@ -152,7 +116,7 @@ namespace DigitalInventory
                         string numVal = s;
                         if (numVal.ToLower().IndexOfAny(new char[] { '(', ')', '[', ']'}) != -1) //Set code with number
                         {
-                            set = helper.parseBracketTagAsSet(s);
+                            set = helper.parseBracketTag(s);
                             continue;
                         }
                         if (numVal.ToLower().Contains("x"))
@@ -161,10 +125,10 @@ namespace DigitalInventory
                         }
                         quant = Convert.ToInt32(numVal);
                     }
-                    else if (s.Contains("[") || s.Contains("(")) //Either set or condition
+                    else if (Utils.IsSetOrCondition(s)) //Either set or condition
                     {
                         string tag = helper.parseBracketTag(s);
-                        if (tag.Equals("nm") || tag.Equals("lp") || tag.Equals("mp") || tag.Equals("hp"))
+                        if (Utils.IsTagCondition(tag))
                         {
                             condition = tag.ToUpper();
                         }
@@ -182,7 +146,7 @@ namespace DigitalInventory
                 StringBuilder nameBuild = new StringBuilder();
                 foreach (string nameFrag in nameFrags)
                 {
-                    nameBuild.Append(firstCharToUpper(nameFrag) + " ");
+                    nameBuild.Append(Utils.FirstCharToUpper(nameFrag) + " ");
                 }
                 name = nameBuild.ToString().Trim(' ');
                 //Check if card exists
@@ -213,20 +177,13 @@ namespace DigitalInventory
                         continue;
                     }
                 }
-                addCardToListFromClipboard(name, set, quant, condition);
+                AddCardToListFromClipboard(name, set, quant, condition);
             }
             if (importErrorFlag)
             {
                 MessageBox.Show("Error importing one or more cards.");
             }
             ClipboardTextForm.ActiveForm.Close();
-        }
-
-        private string firstCharToUpper(string input)
-        {
-            if (String.IsNullOrEmpty(input))
-                throw new ArgumentException("ARGH!");
-            return input.First().ToString().ToUpper() + input.Substring(1);
         }
 
         private void textImportMenuItem_Click(object sender, EventArgs e)
@@ -236,8 +193,46 @@ namespace DigitalInventory
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            // TODO: This line of code loads data into the 'inventoryDataSet.Inventory' table. You can move, or remove it, as needed.
             this.inventoryTableAdapter.Fill(this.inventoryDataSet.Inventory);
+
+            //Load set data
+            using (var stream = new MemoryStream(Properties.Resources.AllSetsArray))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    HashSet<string> cardHash = new HashSet<string>(); //Hash of each unique card name
+                    Dictionary<string, string[]> setDictionary = new Dictionary<string, string[]>(); //Dictionary of set code and the card names in each set
+                    Dictionary<string, int> multiverseDictionary = new Dictionary<string, int>();
+                    Dictionary<string, string[]> mciDictionary = new Dictionary<string, string[]>();
+                    List<string> cards = new List<string>();
+
+                    string json = reader.ReadToEnd();
+                    List<SetInfo> sets = JsonConvert.DeserializeObject<List<SetInfo>>(json);
+
+                    if (sets != null)
+                    {
+                        foreach (SetInfo set in sets)
+                        {
+                            string setCode = set.code; //Uppercase 3-4 character code of set
+                            string[] _cards = new string[set.cards.Length]; //Array of card names in set
+                            for (int i = 0; i < set.cards.Length; i++)
+                            {
+                                Card card = set.cards[i];
+                                cards.Add(card.name + "-" + setCode);
+                                cardHash.Add(card.name);
+                                _cards[i] = card.name;
+                            }
+                            setDictionary.Add(setCode, _cards);
+                        }
+                        this.cardNameToAdd.AutoCompleteMode = AutoCompleteMode.Suggest;
+                        this.cardNameToAdd.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                        AutoCompleteStringCollection acsc = new AutoCompleteStringCollection();
+                        acsc.AddRange(cards.ToArray());
+                        this.cardNameToAdd.AutoCompleteCustomSource = acsc;
+                        helper = new SetDataHelper(cardHash, setDictionary, multiverseDictionary);
+                    }
+                }
+            }
         }
 
         private void inventoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -247,9 +242,64 @@ namespace DigitalInventory
                 return;
             if (dgv.CurrentRow.Selected)
             {
-                Console.WriteLine("Clicked a selected row");
-                Console.WriteLine(dgv.CurrentRow.Cells[0]);
+                DataGridViewCell cell = dgv.CurrentRow.Cells[1];
+                cardNameLabel1.Text = (string)cell.Value;
             }
+        }
+
+        /// <summary>
+        /// Called whenever the user chooses the save option. This will save any
+        /// new changes to the database file since the last save.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NotifySaveDone();
+        }
+
+        private bool saveNeeded = false;
+
+        /// <summary>
+        /// Called whenever a card is added. This indicates that the user should
+        /// save the database.
+        /// </summary>
+        private void NotifySaveNeeded()
+        {
+            this.Text = this.Text + "*";
+            saveNeeded = true;
+        }
+
+        /// <summary>
+        /// Called whenever the user indicates to save the database. This removes the
+        /// asterisk from the title and saves the database.
+        /// </summary>
+        private void NotifySaveDone()
+        {
+            this.Text = this.Text.TrimEnd('*');
+            saveNeeded = false;
+            inventoryDataSetBindingSource.EndEdit();
+            inventoryTableAdapter.Update(inventoryDataSet.Inventory);
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (saveNeeded)
+            {
+                DialogResult dialogResult = MessageBox.Show("Are you sure you want to close without saving? " +
+                    "Your cards will not be saved", "Warning", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private void ResetCardParameters()
+        {
+            cardNameToAdd.Text = "";
+            conditionSelection.SelectedIndex = 0;
+            quantitySelection.Value = 1;
         }
     }
 }
