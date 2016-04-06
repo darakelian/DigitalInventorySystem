@@ -249,9 +249,6 @@ namespace DigitalInventory
             {
                 Console.WriteLine("Clicked a selected row");
                 Console.WriteLine(dgv.CurrentRow.Cells[0]);
-                //If we clicked on the condition cell
-                //string cardName = (string)dgv.CurrentRow.Cells[0].Value;
-                //this.cardNameLabel1.Text = cardName;
             }
         }
     }
