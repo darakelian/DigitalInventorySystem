@@ -10,8 +10,6 @@
 
 #pragma warning disable 1591
 
-using System;
-
 namespace DigitalInventory {
     
     
@@ -950,17 +948,6 @@ SELECT Id, Name, [Set], Quantity, Condition, Price FROM Inventory WHERE (Id = @I
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
-        [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Select, true)]
-        public virtual InventoryDataSet.InventoryDataTable GetData() {
-            this.Adapter.SelectCommand = this.CommandCollection[0];
-            InventoryDataSet.InventoryDataTable dataTable = new InventoryDataSet.InventoryDataTable();
-            this.Adapter.Fill(dataTable);
-            return dataTable;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         public virtual int Update(InventoryDataSet.InventoryDataTable dataTable) {
             return this.Adapter.Update(dataTable);
         }
@@ -1149,7 +1136,6 @@ SELECT Id, Name, [Set], Quantity, Condition, Price FROM Inventory WHERE (Id = @I
         public virtual int Update(string Name, string Set, int Quantity, string Condition, double Price, global::System.Nullable<int> Original_Id, string Original_Set, int Original_Quantity, string Original_Condition, double Original_Price) {
             return this.Update(Original_Id, Name, Set, Quantity, Condition, Price, Original_Id, Original_Set, Original_Quantity, Original_Condition, Original_Price);
         }
-
     }
     
     /// <summary>

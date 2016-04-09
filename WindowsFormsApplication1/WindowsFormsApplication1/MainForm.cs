@@ -51,7 +51,7 @@ namespace DigitalInventory
 
         /// <summary>
         /// If the card name was validated as being a real card, interpret data
-        /// about the card and then add it to the data base.
+        /// about the card and then add it to the database.
         /// </summary>
         /// <param name="cardname">The name of the card being added.</param>
         private void AddCardToListFromTextBox(string cardname)
@@ -60,35 +60,70 @@ namespace DigitalInventory
             string set = cardname.Substring(cardname.LastIndexOf("-") + 1);
             int quantity = Decimal.ToInt32(quantitySelection.Value);
             string condition = conditionSelection.SelectedItem.ToString();
-            float price = helper.getPrice(name);
-            inventoryDataSet.Inventory.AddInventoryRow(name, set, quantity, condition, price);
-            if (!saveNeeded)
-            {
-                NotifySaveNeeded();
-            }
+            AddCardToDatabase(name, set, quantity, condition);
             ResetCardParameters();
         }
 
-        private void AddCardToListFromClipboard(string cardname, string set, int quantity, string condition)
+        /// <summary>
+        /// Adds a card to the database and prompts the user that a save is needed.
+        /// Working on checking if the card is already in the database and if so
+        /// updating the quantity rather than creating a new entry.
+        /// </summary>
+        /// <param name="cardname">Name of card being added</param>
+        /// <param name="set">Set of card being added</param>
+        /// <param name="quantity">Quantity of card being added</param>
+        /// <param name="condition">Condition of card being added</param>
+        private void AddCardToDatabase(string cardname, string set, int quantity, string condition)
         {
-            float price = helper.getPrice(cardname);
+            float price = helper.GetPrice(cardname);
             //Check if database already contains a card, set, condition pair
-            IEnumerable<DataRow> rowsQuery =
+            IEnumerable<InventoryDataSet.InventoryRow> rowsQuery = 
                 from row in inventoryDataSet.Inventory.AsEnumerable()
-                where row.Name.Equals(cardname)
-                where row.Condition.Equals(condition)
-                where row.Set.Equals(set)
+                    where row.Name.Equals(cardname)
+                    where row.Set.Trim().Equals(set)
+                    where row.Condition.Trim().Equals(condition)
                 select row;
-            Console.WriteLine("There were {0} rows with the criteria matched.", rowsQuery.Count());
 
-            inventoryDataSet.Inventory.AddInventoryRow(cardname, set, quantity, condition, price);
+            Console.WriteLine("Searched for card: {0}, set: {1}, cond: {2} and found {3} matches", cardname, set, condition, rowsQuery.Count());
+
+            if (rowsQuery.Count() == 0)
+            {
+                inventoryDataSet.Inventory.AddInventoryRow(cardname, set, quantity, condition, price);
+            }
             if (!saveNeeded)
             {
                 NotifySaveNeeded();
             }
         }
 
+        /// <summary>
+        /// Called whenever the user clicks on the import from clipboard menu.
+        /// item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void clipboardImportMenuItem_Click(object sender, EventArgs e)
+        {
+            ClipboardTextImport(sender);
+        }
+
+        /// <summary>
+        /// Called when the user chooses import from text in the dropdown menu.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textImportMenuItem_Click(object sender, EventArgs e)
+        {
+            ClipboardTextImport(sender);
+        }
+
+        /// <summary>
+        /// Called by either the import from clipboard or text menu item. Creates
+        /// a new ClipboardTextForm object and if the clipboard option was clicked
+        /// sets the textbox contents equal to the text contents of the clipboard.
+        /// </summary>
+        /// <param name="sender">ToolStripMenuItem that was clicked to call this method</param>
+        private void ClipboardTextImport(object sender)
         {
             ToolStripMenuItem menuItem = (ToolStripMenuItem)sender;
             ClipboardTextForm clipboardImportForm = new ClipboardTextForm();
@@ -99,20 +134,215 @@ namespace DigitalInventory
                 clipboardImportForm.clipboardTextbox.TabIndex = 2;
                 clipboardImportForm.clipboardTextbox.Select(0, 0);
             }
+            //Sets the proper click handlers and shows the form
             clipboardImportForm.cancelCardsFromClip.Click += new System.EventHandler(this.cancelCards_Click);
             clipboardImportForm.addCardsFromClip.Click += new System.EventHandler(this.addCards_Click);
             clipboardImportForm.ShowDialog(this);
         }
 
+        /// <summary>
+        /// Called when the user chooses the cancel option on the ClipboardTextForm form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cancelCards_Click(object sender, EventArgs e)
         {
             ClipboardTextForm.ActiveForm.Close();
         }
 
+        /// <summary>
+        /// Called when the user chooses the add option on the ClipboardTextForm form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addCards_Click(object sender, EventArgs e)
         {
             ClipboardTextForm form = (ClipboardTextForm)ClipboardTextForm.ActiveForm;
             string rawCardsList = form.clipboardTextbox.Text;
+            ParseCardData(rawCardsList);
+            ClipboardTextForm.ActiveForm.Close();
+        }
+
+        /// <summary>
+        /// Main load method that fills the DataGridView with the contents of
+        /// the database and loads the set data via a SetDataHelper object.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            this.inventoryTableAdapter.Fill(this.inventoryDataSet.Inventory);
+            helper = new SetDataHelper();
+            this.cardNameToAdd.AutoCompleteMode = AutoCompleteMode.Suggest;
+            this.cardNameToAdd.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            this.cardNameToAdd.AutoCompleteCustomSource = helper.AutoCompleteSource;
+        }
+
+        /// <summary>
+        /// Called whenever the user clicks on a cell in the DataGridView and
+        /// displays information about the card.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void inventoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView dgv = sender as DataGridView;
+            if (dgv == null)
+                return;
+            if (dgv.CurrentRow.Selected)
+            {
+                DataGridViewCell cell = dgv.CurrentRow.Cells[1];
+                cardNameLabel1.Text = (string)cell.Value;
+            }
+        }
+
+        /// <summary>
+        /// Called whenever the user chooses the save option. This will save any
+        /// new changes to the database file since the last save.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NotifySaveDone();
+        }
+
+        /// <summary>
+        /// Value storing if a save is needed (aka if new data was put into the
+        /// database).
+        /// </summary>
+        private bool saveNeeded = false;
+
+        /// <summary>
+        /// Called whenever a card is added. This indicates that the user should
+        /// save the database.
+        /// </summary>
+        private void NotifySaveNeeded()
+        {
+            this.Text = this.Text + "*";
+            saveNeeded = true;
+        }
+
+        /// <summary>
+        /// Called whenever the user indicates to save the database. This removes the
+        /// asterisk from the title and saves the database.
+        /// </summary>
+        private void NotifySaveDone()
+        {
+            this.Text = this.Text.TrimEnd('*');
+            saveNeeded = false;
+            
+            inventoryBindingSource.EndEdit();
+            inventoryTableAdapter.Update(inventoryDataSet.Inventory);
+        }
+
+        /// <summary>
+        /// Called as the form is closing. If there changes to the databse that
+        /// weren't saved, prompts the user to double check if they want to exit
+        /// via a DialogResult box. If yes, exits without saving, if no, stops
+        /// the form from closing.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (saveNeeded)
+            {
+                DialogResult dialogResult = MessageBox.Show("Are you sure you want to close without saving? " +
+                    "Your cards will not be saved", "Warning", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clears the textbox, sets condition selection to NM and quantity to 1.
+        /// </summary>
+        private void ResetCardParameters()
+        {
+            cardNameToAdd.Text = "";
+            conditionSelection.SelectedIndex = 0;
+            quantitySelection.Value = 1;
+        }
+
+        /// <summary>
+        /// Copies database to clipboard
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DataTable table = inventoryDataSet.Inventory;
+            StringBuilder stringb = new StringBuilder();
+            foreach (DataRow row in table.Rows)
+            {
+                stringb.AppendFormat("{0} {1} {2} {3}", row.ItemArray[1].ToString().Trim(' '),
+                    "[" + row.ItemArray[2].ToString().Trim(' ') + "]", row.ItemArray[3].ToString().Trim(' '), 
+                    "[" + row.ItemArray[4].ToString().Trim(' ') + "]");
+                stringb.AppendLine();
+            }
+            Clipboard.Clear();
+            Clipboard.SetText(stringb.ToString());
+        }
+
+        /// <summary>
+        /// Called when a user chooses the import from .txt file option. This
+        /// method will display a file selector of .txt type in the user's documents
+        /// folder and will then parse the text file as if the user had typed the text.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void fromFiletxtToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stream fileStream = null;
+            OpenFileDialog openFile = new OpenFileDialog();
+            openFile.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            openFile.Filter = "txt files (*.txt)|*.txt";
+            openFile.FilterIndex = 1;
+            openFile.RestoreDirectory = true;
+            if (openFile.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    if ((fileStream = openFile.OpenFile()) != null)
+                    {
+                        using (fileStream)
+                        {
+                            using (var reader = new StreamReader(fileStream))
+                            {
+                                ParseCardData(reader.ReadToEnd());
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method is responsible for parsing card data when received from
+        /// the textbox or a .txt file. It follows the following methodology.
+        /// 1. Split the string into seperate lines by split via the \n and \r 
+        /// literals.
+        /// 2. For each string in the array, split via the space delimeter.
+        /// 3. For each token, determine if it is a set, condition or name tag. 
+        /// Name tags get added to the list of name pieces to be recombined at the end. 
+        /// In order to determine if a tag is a condition or set tag, it has 
+        /// its brackets removed and then if statements check whats what.
+        /// 4. Once all the data has been parsed, it gets added to the database
+        /// and tells the user they better save their shit otherwise the data
+        /// isn't officially committed to the database.
+        /// </summary>
+        /// <param name="rawCardsList">
+        /// The is the raw text data as a single string that will be parsed
+        /// </param>
+        private void ParseCardData(string rawCardsList)
+        {
             string[] rawCardsArray = rawCardsList.Split(new Char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             bool importErrorFlag = false;
             foreach (string rawCardLine in rawCardsArray)
@@ -183,7 +413,8 @@ namespace DigitalInventory
                 else
                 {
                     //Set doesn't even exist
-                    if (helper.SetForCode(set) == null) {
+                    if (helper.SetForCode(set) == null)
+                    {
                         importErrorFlag = true;
                         Console.WriteLine("Set code invalid, set {0}", set);
                         continue;
@@ -196,154 +427,12 @@ namespace DigitalInventory
                         continue;
                     }
                 }
-                AddCardToListFromClipboard(name, set, quant, condition);
+                AddCardToDatabase(name, set, quant, condition);
             }
             if (importErrorFlag)
             {
                 MessageBox.Show("Error importing one or more cards.");
             }
-            ClipboardTextForm.ActiveForm.Close();
-        }
-
-        private void textImportMenuItem_Click(object sender, EventArgs e)
-        {
-            clipboardImportMenuItem_Click(sender, e);
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            this.inventoryTableAdapter.Fill(this.inventoryDataSet.Inventory);
-
-            //Load set data
-            using (var stream = new MemoryStream(Properties.Resources.AllSetsArray))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    HashSet<string> cardHash = new HashSet<string>(); //Hash of each unique card name
-                    Dictionary<string, string[]> setDictionary = new Dictionary<string, string[]>(); //Dictionary of set code and the card names in each set
-                    Dictionary<string, int> multiverseDictionary = new Dictionary<string, int>();
-                    Dictionary<string, string[]> mciDictionary = new Dictionary<string, string[]>();
-                    List<string> cards = new List<string>();
-
-                    string json = reader.ReadToEnd();
-                    List<SetInfo> sets = JsonConvert.DeserializeObject<List<SetInfo>>(json);
-
-                    if (sets != null)
-                    {
-                        foreach (SetInfo set in sets)
-                        {
-                            string setCode = set.code.ToUpper(); //Uppercase 3-4 character code of set
-                            string[] _cards = new string[set.cards.Length]; //Array of card names in set
-                            for (int i = 0; i < set.cards.Length; i++)
-                            {
-                                Card card = set.cards[i];
-                                cards.Add(card.name + "-" + setCode);
-                                cardHash.Add(card.name);
-                                _cards[i] = card.name;
-                            }
-                            setDictionary.Add(setCode, _cards);
-                        }
-                        this.cardNameToAdd.AutoCompleteMode = AutoCompleteMode.Suggest;
-                        this.cardNameToAdd.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                        AutoCompleteStringCollection acsc = new AutoCompleteStringCollection();
-                        acsc.AddRange(cards.ToArray());
-                        this.cardNameToAdd.AutoCompleteCustomSource = acsc;
-                        helper = new SetDataHelper(cardHash, setDictionary, multiverseDictionary);
-                    }
-                }
-            }
-        }
-
-        private void inventoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            DataGridView dgv = sender as DataGridView;
-            if (dgv == null)
-                return;
-            if (dgv.CurrentRow.Selected)
-            {
-                DataGridViewCell cell = dgv.CurrentRow.Cells[1];
-                cardNameLabel1.Text = (string)cell.Value;
-            }
-        }
-
-        /// <summary>
-        /// Called whenever the user chooses the save option. This will save any
-        /// new changes to the database file since the last save.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            NotifySaveDone();
-        }
-
-        private bool saveNeeded = false;
-
-        /// <summary>
-        /// Called whenever a card is added. This indicates that the user should
-        /// save the database.
-        /// </summary>
-        private void NotifySaveNeeded()
-        {
-            this.Text = this.Text + "*";
-            saveNeeded = true;
-        }
-
-        /// <summary>
-        /// Called whenever the user indicates to save the database. This removes the
-        /// asterisk from the title and saves the database.
-        /// </summary>
-        private void NotifySaveDone()
-        {
-            this.Text = this.Text.TrimEnd('*');
-            saveNeeded = false;
-            inventoryDataSetBindingSource.EndEdit();
-            inventoryTableAdapter.Update(inventoryDataSet.Inventory);
-        }
-
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (saveNeeded)
-            {
-                DialogResult dialogResult = MessageBox.Show("Are you sure you want to close without saving? " +
-                    "Your cards will not be saved", "Warning", MessageBoxButtons.YesNo);
-                if (dialogResult == DialogResult.No)
-                {
-                    e.Cancel = true;
-                }
-            }
-        }
-
-        private void ResetCardParameters()
-        {
-            cardNameToAdd.Text = "";
-            conditionSelection.SelectedIndex = 0;
-            quantitySelection.Value = 1;
-        }
-
-        /// <summary>
-        /// Copies database to clipboard
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void toClipboardToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            DataTable table = inventoryDataSet.Inventory;
-            StringBuilder stringb = new StringBuilder();
-            foreach (DataRow row in table.Rows)
-            {
-                //for (int i = 1; i < row.ItemArray.Length; i++)
-                //{
-                //  object item = row.ItemArray[i];
-                //  stringb.Append(item.ToString() + " ");
-                //}
-                stringb.AppendFormat("{0} {1} {2} {3}", row.ItemArray[1].ToString().Trim(' '),
-                    "[" + row.ItemArray[2].ToString().Trim(' ') + "]", row.ItemArray[3].ToString().Trim(' '), 
-                    "[" + row.ItemArray[4].ToString().Trim(' ') + "]");
-                stringb.AppendLine();
-            }
-            Clipboard.Clear();
-            Clipboard.SetText(stringb.ToString());
         }
     }
 }
