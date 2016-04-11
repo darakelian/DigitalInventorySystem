@@ -12,8 +12,9 @@ namespace DigitalInventory
     class SetDataHelper
     {
         private HashSet<string> cardHash;
-        private Dictionary<string, string[]> setDictionary;
-        private Dictionary<string, string> mciSetDictionary;
+        private Dictionary<string, object[]> setDictionary;
+        private Dictionary<string, int> gathererIdsDictionary;
+        private Dictionary<string, string> rarityDictionary;
         private AutoCompleteStringCollection acsc;
 
         /// <summary>
@@ -28,8 +29,9 @@ namespace DigitalInventory
                 using (var reader = new StreamReader(stream))
                 {
                     cardHash = new HashSet<string>(); //Hash of each unique card name
-                    setDictionary = new Dictionary<string, string[]>(); //Dictionary of set code and the card names in each set
-                    mciSetDictionary = new Dictionary<string, string>(); //Dictionary of set codes and corresponding mci codes
+                    setDictionary = new Dictionary<string, object[]>(); //Dictionary of set code and the card names in each set
+                    gathererIdsDictionary = new Dictionary<string, int>(); //Dictionary of gatherer ids
+                    rarityDictionary = new Dictionary<string, string>(); //Dictionary of raritys
                     List<string> cards = new List<string>();
 
                     string json = reader.ReadToEnd();
@@ -39,17 +41,28 @@ namespace DigitalInventory
                     {
                         foreach (SetInfo set in sets)
                         {
-                            string setCode = set.code.ToUpper(); //Uppercase 3-4 character code of set
-                            mciSetDictionary[setCode] = set.magicCardsInfoCode;
+                            string setCode = set.code; //Uppercase 3-4 character code of set
+                            if (setCode.ElementAt(0).Equals('p'))
+                            {
+                                continue;
+                            }
+                            setCode = setCode.ToUpper();
                             string[] _cards = new string[set.cards.Length]; //Array of card names in set
                             for (int i = 0; i < set.cards.Length; i++)
                             {
-                                Card card = set.cards[i];
-                                cards.Add(card.name + "-" + setCode);
-                                cardHash.Add(card.name);
-                                _cards[i] = card.name;
+                                cards.Add(set.cards[i].name + "-" + setCode);
+                                if (!gathererIdsDictionary.Keys.Contains(set.cards[i].name.ToLower() + "-" + setCode))
+                                {
+                                    gathererIdsDictionary[set.cards[i].name.ToLower() + "-" + setCode] = set.cards[i].multiverseid;
+                                }
+                                if (!rarityDictionary.Keys.Contains(set.cards[i].name.ToLower() + "-" + setCode))
+                                {
+                                    rarityDictionary[set.cards[i].name.ToLower() + "-" + setCode] = set.cards[i].rarity;
+                                }
+                                cardHash.Add(set.cards[i].name);
+                                _cards[i] = set.cards[i].name;
                             }
-                            setDictionary.Add(setCode, _cards);
+                            setDictionary[setCode] = new object[] { set.name, _cards };
                         }
                         acsc = new AutoCompleteStringCollection();
                         acsc.AddRange(cards.ToArray());
@@ -102,11 +115,23 @@ namespace DigitalInventory
         {
             try
             {
-                return setDictionary[code.ToUpper()];
+                return (string[])setDictionary[code][1];
             }
             catch (KeyNotFoundException)
             {
                 return null;
+            }
+        }
+
+        public string SetNameForCode(string code)
+        {
+            try
+            {
+                return (string)setDictionary[code][0];
+            }
+            catch (KeyNotFoundException)
+            {
+                return "alpha-edition";
             }
         }
 
@@ -130,24 +155,22 @@ namespace DigitalInventory
             return "LEA";
         }
 
-        /// <summary>
-        /// Converts a Gatherer 3-4 character set code to a magiccards.info set
-        /// code in order to retrieve images.
-        /// </summary>
-        /// <param name="set">Gatherer set code</param>
-        /// <returns>magiccards.info set code</returns>
-        public string MciSetForSet(string set)
+        public int GathererIdForCard(string card, string set)
         {
+            if (set == null)
+            {
+                set = DefaultSet(card);
+            }
             try
             {
-                return mciSetDictionary[set];
+                return gathererIdsDictionary[card.ToLower() + "-" + set];
             }
-            catch (KeyNotFoundException ex)
+            catch (KeyNotFoundException)
             {
-                Console.WriteLine(ex.Message);
-                return "al";
+                return 1;
             }
         }
+
 
         /// <summary>
         /// Gets the price of a card from its default set using TCGPlayer data.
@@ -171,6 +194,34 @@ namespace DigitalInventory
         }
 
         /// <summary>
+        /// Gets the rarity of a card from it's default set.
+        /// </summary>
+        /// <param name="card"></param>
+        /// <returns>String value of card's rarity</returns>
+        public string GetRarity(string card)
+        {
+            return GetRarity(card, DefaultSet(card));
+        }
+
+        /// <summary>
+        /// Gets the rarity of a card from the specified set.
+        /// </summary>
+        /// <param name="card"></param>
+        /// <param name="set"></param>
+        /// <returns></returns>
+        public string GetRarity(string card, string set)
+        {
+            try
+            {
+                return rarityDictionary[card.ToLower() + "-" + set];
+            }
+            catch (KeyNotFoundException)
+            {
+                return "common";
+            }
+        }
+
+        /// <summary>
         /// Public field accessing the AutoCompleteStringCollection that is created
         /// when the data is loaded.
         /// </summary>
@@ -182,5 +233,39 @@ namespace DigitalInventory
             }
         }
 
+        /// <summary>
+        /// Converts a fully qualified condition type to the 2 letter code.
+        /// Defaults to return NM.
+        /// </summary>
+        /// <param name="longCondition"></param>
+        /// <returns></returns>
+        public string ShortenCondition(string longCondition)
+        {
+            if (longCondition.Equals("heavily played"))
+            {
+                return "HP";
+            }
+            else if (longCondition.Equals("moderately played"))
+            {
+                return "MP";
+            }
+            else if (longCondition.Equals("lightly played"))
+            {
+                return "LP";
+            }
+            else
+            {
+                return "MN";
+            }
+        }
+
+        public string CreateTCGPlayerURL(string card, string set)
+        {
+            string name = card.ToLower().Replace(" ", "-");
+            string longSet = SetNameForCode(set).ToLower().Replace(" ", "-");
+            return String.Format("http://shop.tcgplayer.com/magic/{0}/{1}", longSet, name);
+        }
+
     }
+
 }

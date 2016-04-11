@@ -30,9 +30,25 @@
         {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.priceLabel = new System.Windows.Forms.Label();
+            this.quantityLabel2 = new System.Windows.Forms.Label();
+            this.conditionLabel = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.cardNameLabel1 = new System.Windows.Forms.Label();
+            this.nameLabel = new System.Windows.Forms.Label();
+            this.FoilCheckBox = new System.Windows.Forms.CheckBox();
             this.inventoryDataGridView = new System.Windows.Forms.DataGridView();
+            this.Id = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Foil = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.RowRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showOnTCGPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.inventoryBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.inventoryDataSet = new DigitalInventory.InventoryDataSet();
             this.quantitySelection = new System.Windows.Forms.NumericUpDown();
             this.quantityLabel = new System.Windows.Forms.Label();
             this.conditionSelection = new System.Windows.Forms.ComboBox();
@@ -45,7 +61,6 @@
             this.clipboardImportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fromFilecsvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fromFiletxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textImportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,26 +69,19 @@
             this.settingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shopInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pricingRulesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.inventoryBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.inventoryDataSet = new DigitalInventory.InventoryDataSet();
             this.inventoryTableAdapter = new DigitalInventory.InventoryDataSetTableAdapters.InventoryTableAdapter();
             this.tableAdapterManager = new DigitalInventory.InventoryDataSetTableAdapters.TableAdapterManager();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inventoryDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.quantitySelection)).BeginInit();
-            this.menuStrip1.SuspendLayout();
+            this.RowRightClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.inventoryBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inventoryDataSet)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.quantitySelection)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -87,12 +95,16 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.priceLabel);
+            this.splitContainer1.Panel1.Controls.Add(this.quantityLabel2);
+            this.splitContainer1.Panel1.Controls.Add(this.conditionLabel);
             this.splitContainer1.Panel1.Controls.Add(this.pictureBox1);
-            this.splitContainer1.Panel1.Controls.Add(this.cardNameLabel1);
+            this.splitContainer1.Panel1.Controls.Add(this.nameLabel);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.AutoScroll = true;
+            this.splitContainer1.Panel2.Controls.Add(this.FoilCheckBox);
             this.splitContainer1.Panel2.Controls.Add(this.inventoryDataGridView);
             this.splitContainer1.Panel2.Controls.Add(this.quantitySelection);
             this.splitContainer1.Panel2.Controls.Add(this.quantityLabel);
@@ -103,29 +115,70 @@
             this.splitContainer1.SplitterDistance = 261;
             this.splitContainer1.TabIndex = 0;
             // 
+            // priceLabel
+            // 
+            this.priceLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.priceLabel.Location = new System.Drawing.Point(0, 462);
+            this.priceLabel.Name = "priceLabel";
+            this.priceLabel.Size = new System.Drawing.Size(261, 23);
+            this.priceLabel.TabIndex = 4;
+            this.priceLabel.Text = "Price: ";
+            this.priceLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // quantityLabel2
+            // 
+            this.quantityLabel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.quantityLabel2.Location = new System.Drawing.Point(0, 485);
+            this.quantityLabel2.Name = "quantityLabel2";
+            this.quantityLabel2.Size = new System.Drawing.Size(261, 23);
+            this.quantityLabel2.TabIndex = 3;
+            this.quantityLabel2.Text = "Quantity: ";
+            this.quantityLabel2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // conditionLabel
+            // 
+            this.conditionLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.conditionLabel.Location = new System.Drawing.Point(0, 508);
+            this.conditionLabel.Name = "conditionLabel";
+            this.conditionLabel.Size = new System.Drawing.Size(261, 23);
+            this.conditionLabel.TabIndex = 2;
+            this.conditionLabel.Text = "Condition: ";
+            this.conditionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // pictureBox1
             // 
             this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.Image = global::DigitalInventory.Properties.Resources.senior_pic;
             this.pictureBox1.ImageLocation = "";
             this.pictureBox1.InitialImage = null;
-            this.pictureBox1.Location = new System.Drawing.Point(44, 67);
+            this.pictureBox1.Location = new System.Drawing.Point(35, 67);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(177, 238);
+            this.pictureBox1.Size = new System.Drawing.Size(180, 240);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 1;
             this.pictureBox1.TabStop = false;
             // 
-            // cardNameLabel1
+            // nameLabel
             // 
-            this.cardNameLabel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cardNameLabel1.Location = new System.Drawing.Point(3, 9);
-            this.cardNameLabel1.Name = "cardNameLabel1";
-            this.cardNameLabel1.Size = new System.Drawing.Size(255, 23);
-            this.cardNameLabel1.TabIndex = 0;
-            this.cardNameLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.nameLabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.nameLabel.Location = new System.Drawing.Point(0, 0);
+            this.nameLabel.Name = "nameLabel";
+            this.nameLabel.Size = new System.Drawing.Size(261, 23);
+            this.nameLabel.TabIndex = 0;
+            this.nameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // FoilCheckBox
+            // 
+            this.FoilCheckBox.AutoSize = true;
+            this.FoilCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.FoilCheckBox.Location = new System.Drawing.Point(269, 17);
+            this.FoilCheckBox.Name = "FoilCheckBox";
+            this.FoilCheckBox.Size = new System.Drawing.Size(45, 17);
+            this.FoilCheckBox.TabIndex = 7;
+            this.FoilCheckBox.Text = "Foil:";
+            this.FoilCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.FoilCheckBox.UseVisualStyleBackColor = true;
             // 
             // inventoryDataGridView
             // 
@@ -138,12 +191,14 @@
             this.inventoryDataGridView.AutoGenerateColumns = false;
             this.inventoryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.inventoryDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn1,
+            this.Id,
             this.dataGridViewTextBoxColumn2,
             this.dataGridViewTextBoxColumn3,
             this.dataGridViewTextBoxColumn4,
             this.dataGridViewTextBoxColumn5,
-            this.dataGridViewTextBoxColumn6});
+            this.dataGridViewTextBoxColumn6,
+            this.Foil});
+            this.inventoryDataGridView.ContextMenuStrip = this.RowRightClick;
             this.inventoryDataGridView.DataSource = this.inventoryBindingSource;
             this.inventoryDataGridView.Location = new System.Drawing.Point(17, 67);
             this.inventoryDataGridView.MultiSelect = false;
@@ -153,7 +208,101 @@
             this.inventoryDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.inventoryDataGridView.Size = new System.Drawing.Size(490, 454);
             this.inventoryDataGridView.TabIndex = 6;
-            this.inventoryDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.inventoryDataGridView_CellContentClick);
+            this.inventoryDataGridView.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.inventoryDataGridView_RowEnter);
+            this.inventoryDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.inventoryDataGridView_MouseDown);
+            // 
+            // Id
+            // 
+            this.Id.DataPropertyName = "Id";
+            this.Id.HeaderText = "Id";
+            this.Id.Name = "Id";
+            this.Id.ReadOnly = true;
+            this.Id.Visible = false;
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewTextBoxColumn2.DataPropertyName = "Name";
+            this.dataGridViewTextBoxColumn2.HeaderText = "Name";
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            this.dataGridViewTextBoxColumn2.ReadOnly = true;
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.dataGridViewTextBoxColumn3.DataPropertyName = "Set";
+            this.dataGridViewTextBoxColumn3.HeaderText = "Set";
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            this.dataGridViewTextBoxColumn3.ReadOnly = true;
+            this.dataGridViewTextBoxColumn3.Width = 48;
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            this.dataGridViewTextBoxColumn4.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.dataGridViewTextBoxColumn4.DataPropertyName = "Quantity";
+            this.dataGridViewTextBoxColumn4.HeaderText = "Quantity";
+            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            this.dataGridViewTextBoxColumn4.ReadOnly = true;
+            this.dataGridViewTextBoxColumn4.Width = 71;
+            // 
+            // dataGridViewTextBoxColumn5
+            // 
+            this.dataGridViewTextBoxColumn5.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.dataGridViewTextBoxColumn5.DataPropertyName = "Condition";
+            this.dataGridViewTextBoxColumn5.HeaderText = "Condition";
+            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
+            this.dataGridViewTextBoxColumn5.ReadOnly = true;
+            this.dataGridViewTextBoxColumn5.Width = 76;
+            // 
+            // dataGridViewTextBoxColumn6
+            // 
+            this.dataGridViewTextBoxColumn6.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.dataGridViewTextBoxColumn6.DataPropertyName = "Price";
+            this.dataGridViewTextBoxColumn6.HeaderText = "Price";
+            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
+            this.dataGridViewTextBoxColumn6.ReadOnly = true;
+            this.dataGridViewTextBoxColumn6.Width = 56;
+            // 
+            // Foil
+            // 
+            this.Foil.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Foil.DataPropertyName = "Foil";
+            this.Foil.HeaderText = "Foil";
+            this.Foil.Name = "Foil";
+            this.Foil.ReadOnly = true;
+            this.Foil.Width = 29;
+            // 
+            // RowRightClick
+            // 
+            this.RowRightClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.removeToolStripMenuItem,
+            this.showOnTCGPlayerToolStripMenuItem});
+            this.RowRightClick.Name = "RowRightClick";
+            this.RowRightClick.Size = new System.Drawing.Size(178, 70);
+            // 
+            // removeToolStripMenuItem
+            // 
+            this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.removeToolStripMenuItem.Text = "Remove";
+            this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
+            // 
+            // showOnTCGPlayerToolStripMenuItem
+            // 
+            this.showOnTCGPlayerToolStripMenuItem.Name = "showOnTCGPlayerToolStripMenuItem";
+            this.showOnTCGPlayerToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.showOnTCGPlayerToolStripMenuItem.Text = "Show on TCGPlayer";
+            this.showOnTCGPlayerToolStripMenuItem.Click += new System.EventHandler(this.showOnTCGPlayerToolStripMenuItem_Click);
+            // 
+            // inventoryBindingSource
+            // 
+            this.inventoryBindingSource.DataMember = "Inventory";
+            this.inventoryBindingSource.DataSource = this.inventoryDataSet;
+            // 
+            // inventoryDataSet
+            // 
+            this.inventoryDataSet.DataSetName = "InventoryDataSet";
+            this.inventoryDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // quantitySelection
             // 
@@ -214,9 +363,9 @@
             // 
             this.cardNameToAdd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cardNameToAdd.Location = new System.Drawing.Point(269, 15);
+            this.cardNameToAdd.Location = new System.Drawing.Point(320, 14);
             this.cardNameToAdd.Name = "cardNameToAdd";
-            this.cardNameToAdd.Size = new System.Drawing.Size(238, 20);
+            this.cardNameToAdd.Size = new System.Drawing.Size(187, 20);
             this.cardNameToAdd.TabIndex = 0;
             // 
             // menuStrip1
@@ -253,7 +402,6 @@
             this.clipboardImportMenuItem,
             this.fromFilecsvToolStripMenuItem,
             this.fromFiletxtToolStripMenuItem,
-            this.fromFileToolStripMenuItem,
             this.textImportMenuItem});
             this.importMenuItem.Name = "importMenuItem";
             this.importMenuItem.Size = new System.Drawing.Size(55, 20);
@@ -271,6 +419,7 @@
             this.fromFilecsvToolStripMenuItem.Name = "fromFilecsvToolStripMenuItem";
             this.fromFilecsvToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.fromFilecsvToolStripMenuItem.Text = "From file (.csv)";
+            this.fromFilecsvToolStripMenuItem.Click += new System.EventHandler(this.fromFilecsvToolStripMenuItem_Click);
             // 
             // fromFiletxtToolStripMenuItem
             // 
@@ -278,12 +427,6 @@
             this.fromFiletxtToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.fromFiletxtToolStripMenuItem.Text = "From file (.txt)";
             this.fromFiletxtToolStripMenuItem.Click += new System.EventHandler(this.fromFiletxtToolStripMenuItem_Click);
-            // 
-            // fromFileToolStripMenuItem
-            // 
-            this.fromFileToolStripMenuItem.Name = "fromFileToolStripMenuItem";
-            this.fromFileToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this.fromFileToolStripMenuItem.Text = "From file (.*)";
             // 
             // textImportMenuItem
             // 
@@ -320,6 +463,7 @@
             this.toCSVToolStripMenuItem.Name = "toCSVToolStripMenuItem";
             this.toCSVToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.toCSVToolStripMenuItem.Text = "To CSV";
+            this.toCSVToolStripMenuItem.Click += new System.EventHandler(this.toCSVToolStripMenuItem_Click);
             // 
             // settingsMenuItem
             // 
@@ -333,24 +477,16 @@
             // shopInformationToolStripMenuItem
             // 
             this.shopInformationToolStripMenuItem.Name = "shopInformationToolStripMenuItem";
-            this.shopInformationToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-            this.shopInformationToolStripMenuItem.Text = "Shop Information";
+            this.shopInformationToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.shopInformationToolStripMenuItem.Text = "General";
+            this.shopInformationToolStripMenuItem.Click += new System.EventHandler(this.shopInformationToolStripMenuItem_Click);
             // 
             // pricingRulesToolStripMenuItem
             // 
             this.pricingRulesToolStripMenuItem.Name = "pricingRulesToolStripMenuItem";
-            this.pricingRulesToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.pricingRulesToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.pricingRulesToolStripMenuItem.Text = "Pricing Rules";
-            // 
-            // inventoryBindingSource
-            // 
-            this.inventoryBindingSource.DataMember = "Inventory";
-            this.inventoryBindingSource.DataSource = this.inventoryDataSet;
-            // 
-            // inventoryDataSet
-            // 
-            this.inventoryDataSet.DataSetName = "InventoryDataSet";
-            this.inventoryDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
+            this.pricingRulesToolStripMenuItem.Click += new System.EventHandler(this.pricingRulesToolStripMenuItem_Click);
             // 
             // inventoryTableAdapter
             // 
@@ -361,56 +497,6 @@
             this.tableAdapterManager.BackupDataSetBeforeUpdate = false;
             this.tableAdapterManager.InventoryTableAdapter = this.inventoryTableAdapter;
             this.tableAdapterManager.UpdateOrder = DigitalInventory.InventoryDataSetTableAdapters.TableAdapterManager.UpdateOrderOption.InsertUpdateDelete;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "Id";
-            this.dataGridViewTextBoxColumn1.HeaderText = "Id";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            this.dataGridViewTextBoxColumn1.ReadOnly = true;
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            this.dataGridViewTextBoxColumn2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCellsExceptHeader;
-            this.dataGridViewTextBoxColumn2.DataPropertyName = "Name";
-            this.dataGridViewTextBoxColumn2.HeaderText = "Name";
-            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            this.dataGridViewTextBoxColumn2.ReadOnly = true;
-            this.dataGridViewTextBoxColumn2.Width = 5;
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            this.dataGridViewTextBoxColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewTextBoxColumn3.DataPropertyName = "Set";
-            this.dataGridViewTextBoxColumn3.HeaderText = "Set";
-            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            this.dataGridViewTextBoxColumn3.ReadOnly = true;
-            // 
-            // dataGridViewTextBoxColumn4
-            // 
-            this.dataGridViewTextBoxColumn4.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.dataGridViewTextBoxColumn4.DataPropertyName = "Quantity";
-            this.dataGridViewTextBoxColumn4.HeaderText = "Quantity";
-            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-            this.dataGridViewTextBoxColumn4.ReadOnly = true;
-            this.dataGridViewTextBoxColumn4.Width = 71;
-            // 
-            // dataGridViewTextBoxColumn5
-            // 
-            this.dataGridViewTextBoxColumn5.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewTextBoxColumn5.DataPropertyName = "Condition";
-            this.dataGridViewTextBoxColumn5.HeaderText = "Condition";
-            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
-            this.dataGridViewTextBoxColumn5.ReadOnly = true;
-            // 
-            // dataGridViewTextBoxColumn6
-            // 
-            this.dataGridViewTextBoxColumn6.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.dataGridViewTextBoxColumn6.DataPropertyName = "Price";
-            this.dataGridViewTextBoxColumn6.HeaderText = "Price";
-            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
-            this.dataGridViewTextBoxColumn6.ReadOnly = true;
             // 
             // MainForm
             // 
@@ -432,11 +518,12 @@
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.inventoryDataGridView)).EndInit();
+            this.RowRightClick.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.inventoryBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.inventoryDataSet)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.quantitySelection)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.inventoryBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.inventoryDataSet)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -459,26 +546,33 @@
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fromFilecsvToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fromFiletxtToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem fromFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toClipboardToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toTextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toCSVToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem shopInformationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pricingRulesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem textImportMenuItem;
-        public System.Windows.Forms.Label cardNameLabel1;
+        public System.Windows.Forms.Label nameLabel;
         private InventoryDataSet inventoryDataSet;
         private System.Windows.Forms.BindingSource inventoryBindingSource;
         private InventoryDataSetTableAdapters.InventoryTableAdapter inventoryTableAdapter;
         private InventoryDataSetTableAdapters.TableAdapterManager tableAdapterManager;
         public System.Windows.Forms.DataGridView inventoryDataGridView;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        public System.Windows.Forms.Label conditionLabel;
+        public System.Windows.Forms.Label priceLabel;
+        public System.Windows.Forms.Label quantityLabel2;
+        private System.Windows.Forms.CheckBox FoilCheckBox;
+        private System.Windows.Forms.ContextMenuStrip RowRightClick;
+        private System.Windows.Forms.ToolStripMenuItem removeToolStripMenuItem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Id;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Foil;
+        private System.Windows.Forms.ToolStripMenuItem showOnTCGPlayerToolStripMenuItem;
     }
 }
 

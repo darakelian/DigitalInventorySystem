@@ -21,9 +21,14 @@ namespace DigitalInventory
         /// </summary>
         /// <param name="tag">The tag being checked.</param>
         /// <returns></returns>
-        public static bool IsSetOrCondition(string tag)
+        public static bool IsInfoTag(string tag)
         {
             return tag.Contains("[") || tag.Contains("(");
+        }
+
+        public static bool IsTagFoil(string tag)
+        {
+            return tag.Equals("f") || tag.Equals("foil");
         }
 
         public static bool IsTagCondition(string tag)

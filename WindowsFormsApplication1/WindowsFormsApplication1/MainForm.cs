@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.FileIO;
 
 namespace DigitalInventory
 {
@@ -53,14 +54,15 @@ namespace DigitalInventory
         /// If the card name was validated as being a real card, interpret data
         /// about the card and then add it to the database.
         /// </summary>
-        /// <param name="cardname">The name of the card being added.</param>
+        /// <param name="cardname">The name of the card being added</param>
         private void AddCardToListFromTextBox(string cardname)
         {
             string name = cardname.Substring(0, cardname.LastIndexOf("-"));
             string set = cardname.Substring(cardname.LastIndexOf("-") + 1);
             int quantity = Decimal.ToInt32(quantitySelection.Value);
             string condition = conditionSelection.SelectedItem.ToString();
-            AddCardToDatabase(name, set, quantity, condition);
+            bool foil = FoilCheckBox.Checked;
+            AddCardToDatabase(name, set, quantity, condition, foil);
             ResetCardParameters();
         }
 
@@ -73,22 +75,29 @@ namespace DigitalInventory
         /// <param name="set">Set of card being added</param>
         /// <param name="quantity">Quantity of card being added</param>
         /// <param name="condition">Condition of card being added</param>
-        private void AddCardToDatabase(string cardname, string set, int quantity, string condition)
+        private void AddCardToDatabase(string cardname, string set, int quantity, string condition, bool foil)
         {
             float price = helper.GetPrice(cardname);
             //Check if database already contains a card, set, condition pair
             IEnumerable<InventoryDataSet.InventoryRow> rowsQuery = 
                 from row in inventoryDataSet.Inventory.AsEnumerable()
                     where row.Name.Equals(cardname)
-                    where row.Set.Trim().Equals(set)
-                    where row.Condition.Trim().Equals(condition)
+                    where row.Set.Equals(set)
+                    where row.Condition.Equals(condition)
+                    where row.Foil.Equals(foil)
                 select row;
 
             Console.WriteLine("Searched for card: {0}, set: {1}, cond: {2} and found {3} matches", cardname, set, condition, rowsQuery.Count());
 
             if (rowsQuery.Count() == 0)
             {
-                inventoryDataSet.Inventory.AddInventoryRow(cardname, set, quantity, condition, price);
+                string rarity = helper.GetRarity(cardname, set);
+                inventoryDataSet.Inventory.AddInventoryRow(cardname, set, quantity, condition, price, rarity, foil);
+            }
+            else
+            {
+                InventoryDataSet.InventoryRow row = rowsQuery.ElementAt(0);
+                row.Quantity += quantity;
             }
             if (!saveNeeded)
             {
@@ -179,20 +188,62 @@ namespace DigitalInventory
         }
 
         /// <summary>
-        /// Called whenever the user clicks on a cell in the DataGridView and
+        /// Called whenever the user clicks on a row/cell in the DataGridView and
         /// displays information about the card.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void inventoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void inventoryDataGridView_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
-            DataGridView dgv = sender as DataGridView;
-            if (dgv == null)
-                return;
-            if (dgv.CurrentRow.Selected)
+            if (helper != null)
             {
-                DataGridViewCell cell = dgv.CurrentRow.Cells[1];
-                cardNameLabel1.Text = (string)cell.Value;
+                DataGridViewRow row = e != null ? inventoryDataGridView.Rows[e.RowIndex] : 
+                    inventoryDataGridView.Rows[inventoryDataGridView.Rows.GetFirstRow(DataGridViewElementStates.Selected)];
+                if (row.Selected)
+                {
+                    string cardName = (string)row.Cells[1].Value;
+                    string set = row.Cells[2].Value.ToString().Trim();
+                    int quantity = Convert.ToInt32(row.Cells[3].Value.ToString().Trim());
+                    string condition = row.Cells[4].Value.ToString().Trim();
+                    string price = row.Cells[5].Value.ToString().Trim();
+                    string url = String.Format("http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={0}&type=card", helper.GathererIdForCard(cardName, set));
+                    //Load from wizards site and if the image isn't downloaded, download it
+                    try
+                    {
+                        pictureBox1.Load(url);
+                        if (Properties.Settings.Default.SaveLocalFiles && Properties.Settings.Default.LocalFilesDirectory != "")
+                        {
+                            string destPath = Path.Combine(Properties.Settings.Default.LocalFilesDirectory, Convert.ToString(helper.GathererIdForCard(cardName, set)) + ".png");
+                            if (!File.Exists(destPath))
+                            {
+                                using (System.Net.WebClient client = new System.Net.WebClient())
+                                {
+                                    try
+                                    {
+                                        client.DownloadFile(url, destPath);
+                                    }
+                                    catch (System.Net.WebException ex)
+                                    {
+                                        MessageBox.Show(ex.Message);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (System.Net.WebException) //If the image wasn't loaded, check for an offline copy and if one doesn't exist do nothing
+                    {
+                        string destPath = Path.Combine(Properties.Settings.Default.LocalFilesDirectory, 
+                            Convert.ToString(helper.GathererIdForCard(cardName, set)) + ".png");
+                        if (File.Exists(destPath))
+                        {
+                            pictureBox1.Load(destPath);
+                        }
+                    }
+                    nameLabel.Text = cardName;
+                    conditionLabel.Text = conditionLabel.Text.Split(':')[0] + ": " + condition;
+                    quantityLabel2.Text = quantityLabel2.Text.Split(':')[0] + ": " + quantity;
+                    priceLabel.Text = priceLabel.Text.Split(':')[0] + ": " + price;
+                }
             }
         }
 
@@ -265,6 +316,7 @@ namespace DigitalInventory
             cardNameToAdd.Text = "";
             conditionSelection.SelectedIndex = 0;
             quantitySelection.Value = 1;
+            FoilCheckBox.Checked = false;
         }
 
         /// <summary>
@@ -278,10 +330,9 @@ namespace DigitalInventory
             StringBuilder stringb = new StringBuilder();
             foreach (DataRow row in table.Rows)
             {
-                stringb.AppendFormat("{0} {1} {2} {3}", row.ItemArray[1].ToString().Trim(' '),
+                stringb.AppendFormat("{0} {1} {2} {3} {4}", row.ItemArray[1].ToString().Trim(' '),
                     "[" + row.ItemArray[2].ToString().Trim(' ') + "]", row.ItemArray[3].ToString().Trim(' '), 
-                    "[" + row.ItemArray[4].ToString().Trim(' ') + "]");
-                stringb.AppendLine();
+                    "[" + row.ItemArray[4].ToString().Trim(' ') + "]", "\n");
             }
             Clipboard.Clear();
             Clipboard.SetText(stringb.ToString());
@@ -353,17 +404,22 @@ namespace DigitalInventory
                 string set = null;
                 string condition = "NM";
                 string name = "";
+                bool foil = false;
                 foreach (string s in cardTokens)
                 {
                     //If the token is a number, it is the quantity or set code
                     //Try and parse as a tag first
-                    if (Utils.IsSetOrCondition(s))
+                    if (Utils.IsInfoTag(s))
                     {
                         //Check if tag is a condition tag
                         string tag = Utils.ParseBracketTag(s).ToLower();
                         if (Utils.IsTagCondition(tag))
                         {
                             condition = tag.ToUpper();
+                        }
+                        else if (Utils.IsTagFoil(tag))
+                        {
+                            foil = true;
                         }
                         else
                         {
@@ -373,13 +429,9 @@ namespace DigitalInventory
                     else if (Regex.IsMatch(s, @"\d")) //Check for quantity
                     {
                         string numVal = s;
-                        if (numVal.ToLower().Contains('x'))
-                        {
-                            numVal = numVal.Replace("x", "");
-                        }
                         try
                         {
-                            quant = Convert.ToInt32(numVal);
+                            quant = Convert.ToInt32(numVal.ToLower().Contains('x') ? numVal.ToLower().Replace("x", "") : numVal);
                         }
                         catch (ArgumentException)
                         {
@@ -427,12 +479,192 @@ namespace DigitalInventory
                         continue;
                     }
                 }
-                AddCardToDatabase(name, set, quant, condition);
+                AddCardToDatabase(name, set, quant, condition, foil);
             }
             if (importErrorFlag)
             {
                 MessageBox.Show("Error importing one or more cards.");
             }
         }
+
+        /// <summary>
+        /// Prompts the user to select a .csv file to read and then parses the
+        /// pertinent information.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void fromFilecsvToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stream fileStream = null;
+            OpenFileDialog openFile = new OpenFileDialog();
+            openFile.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            openFile.Filter = "csv files (*.csv)|*.csv";
+            openFile.FilterIndex = 1;
+            openFile.RestoreDirectory = true;
+            if (openFile.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    if ((fileStream = openFile.OpenFile()) != null)
+                    {
+                        using (fileStream)
+                        {
+                            using (TextFieldParser reader = new TextFieldParser(fileStream))
+                            {
+                                reader.CommentTokens = new string[] { "#" };
+                                reader.SetDelimiters(new string[] { ",", ";" });
+                                reader.HasFieldsEnclosedInQuotes = true;
+                                string[] headers = reader.ReadFields();
+                                if (headers.Length == 5)
+                                {
+                                    reader.SetDelimiters(new string[] { ";" });
+                                }
+                                while (!reader.EndOfData)
+                                {
+                                    string[] fields = reader.ReadFields();
+                                    ParseCsvFields(fields);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses a line from a deckbox.org csv file.
+        /// </summary>
+        /// <param name="fields">Array of values from the csv line</param>
+        private void ParseCsvFields(string[] fields)
+        {
+            if (fields.Length == 5) //CSV file created by this program
+            {
+                string name = fields[0];
+                string set = fields[1];
+                int quantity = Convert.ToInt32(fields[2]);
+                string condition = fields[3];
+                string foil = fields[4];
+                AddCardToDatabase(name, set, quantity, condition, foil.Equals("foil"));
+            }
+            else
+            {
+                int quantity = Convert.ToInt32(fields[0]);
+                string name = fields[2];
+                string condition = helper.ShortenCondition(fields[5]);
+                string set = helper.DefaultSet(name);
+                string foil = fields[7];
+                AddCardToDatabase(name, set, quantity, condition, foil.Equals("foil"));
+            }
+        }
+
+        /// <summary>
+        /// Called when the user chooses to export the database to a .CSV file;
+        /// prompts the person to select the destination and file name to save
+        /// to and then saves it.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toCSVToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            saveDialog.Filter = "CSV File|.csv";
+            saveDialog.FilterIndex = 1;
+            saveDialog.Title = "Save CSV File";
+            saveDialog.RestoreDirectory = true;
+            saveDialog.ShowDialog();
+
+            if (saveDialog.FileName != "")
+            {
+                using (FileStream fs = (FileStream)saveDialog.OpenFile())
+                {
+                    StringBuilder sb = new StringBuilder();
+                    IEnumerable<string> columnNames = from column in inventoryDataSet.Inventory.Columns.Cast<DataColumn>()
+                                                      where column.ColumnName != "Id"
+                                                      select column.ColumnName;
+                    sb.AppendLine(string.Join(";", columnNames));
+                    foreach (DataRow row in inventoryDataSet.Inventory.Rows)
+                    {
+                        IEnumerable<string> fields = from item in row.ItemArray
+                                                     where item.ToString().IndexOf('-') != 0
+                                                     select item.ToString().Trim();
+                        sb.AppendLine(string.Join(";", fields));
+                    }
+                    fs.Close();
+                    File.WriteAllText(saveDialog.FileName, sb.ToString().Trim());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Shows the general settings menu form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void shopInformationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingsForm form = new SettingsForm();
+            form.ShowDialog(this);
+        }
+
+        /// <summary>
+        /// Shows the pricing settings menu form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void pricingRulesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PricingRulesForm form = new PricingRulesForm();
+            form.ShowDialog(this);
+        }
+
+        /// <summary>
+        /// Removes the right clicked row from the database afte prompting the
+        /// user if they are sure about removing it.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void removeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DataGridViewRow selectedDataRow = inventoryDataGridView.SelectedRows[0];
+            InventoryDataSet.InventoryRow selectedInventoryRow = (InventoryDataSet.InventoryRow)((DataRowView)selectedDataRow.DataBoundItem).Row;
+            if (selectedDataRow != null)
+            {
+                DialogResult dialogResult = MessageBox.Show("Are you sure you want to remove this row?", "Warning", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    inventoryDataGridView.Rows.Remove(selectedDataRow);
+                    inventoryDataGridView.ClearSelection();
+                    NotifySaveNeeded();
+                }
+            }
+        }
+
+        private void showOnTCGPlayerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DataGridViewRow selectedDataRow = inventoryDataGridView.SelectedRows[0];
+            InventoryDataSet.InventoryRow selectedInventoryRow = (InventoryDataSet.InventoryRow)((DataRowView)selectedDataRow.DataBoundItem).Row;
+            if (selectedDataRow != null)
+            {
+                string cardName = selectedInventoryRow.Name;
+                string set = selectedInventoryRow.Set;
+                System.Diagnostics.Process.Start(helper.CreateTCGPlayerURL(cardName, set));
+            }
+        }
+
+        private void inventoryDataGridView_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var hti = inventoryDataGridView.HitTest(e.X, e.Y);
+                inventoryDataGridView.ClearSelection();
+                inventoryDataGridView.Rows[hti.RowIndex].Selected = true;
+                inventoryDataGridView_RowEnter(null, null);
+            }
+        }
+
     }
 }

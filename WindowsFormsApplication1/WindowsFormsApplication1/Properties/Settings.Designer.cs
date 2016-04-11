@@ -33,5 +33,125 @@ namespace DigitalInventory.Properties {
                 return ((string)(this["InventoryConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SaveLocalFiles {
+            get {
+                return ((bool)(this["SaveLocalFiles"]));
+            }
+            set {
+                this["SaveLocalFiles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LocalFilesDirectory {
+            get {
+                return ((string)(this["LocalFilesDirectory"]));
+            }
+            set {
+                this["LocalFilesDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float BulkRarePrice {
+            get {
+                return ((float)(this["BulkRarePrice"]));
+            }
+            set {
+                this["BulkRarePrice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float BulkFoilRarePrice {
+            get {
+                return ((float)(this["BulkFoilRarePrice"]));
+            }
+            set {
+                this["BulkFoilRarePrice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float BulkMythicPrice {
+            get {
+                return ((float)(this["BulkMythicPrice"]));
+            }
+            set {
+                this["BulkMythicPrice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float BulkFoilMythicPrice {
+            get {
+                return ((float)(this["BulkFoilMythicPrice"]));
+            }
+            set {
+                this["BulkFoilMythicPrice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BulkRarePriceThreshold {
+            get {
+                return ((int)(this["BulkRarePriceThreshold"]));
+            }
+            set {
+                this["BulkRarePriceThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BulkFoilRarePriceThreshold {
+            get {
+                return ((int)(this["BulkFoilRarePriceThreshold"]));
+            }
+            set {
+                this["BulkFoilRarePriceThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BulkMythicPriceThreshold {
+            get {
+                return ((int)(this["BulkMythicPriceThreshold"]));
+            }
+            set {
+                this["BulkMythicPriceThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int BulkFoilMythicPriceThreshold {
+            get {
+                return ((int)(this["BulkFoilMythicPriceThreshold"]));
+            }
+            set {
+                this["BulkFoilMythicPriceThreshold"] = value;
+            }
+        }
     }
 }
