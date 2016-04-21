@@ -16,28 +16,10 @@
     <Setting Name="LocalFilesDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="BulkRarePrice" Type="System.Single" Scope="User">
+    <Setting Name="BulkCommonPrice" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="BulkFoilRarePrice" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="BulkMythicPrice" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="BulkFoilMythicPrice" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="BulkRarePriceThreshold" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="BulkFoilRarePriceThreshold" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="BulkMythicPriceThreshold" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="BulkFoilMythicPriceThreshold" Type="System.Int32" Scope="User">
+    <Setting Name="BulkUncommonPrice" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>

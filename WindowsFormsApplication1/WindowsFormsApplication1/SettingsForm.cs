@@ -63,5 +63,37 @@ namespace DigitalInventory
                 }
             }
         }
+
+        private void BulkCommonTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Return)
+            {
+                string text = ((TextBox)sender).Text;
+                if (text.Contains("$"))
+                {
+                    text = text.Replace("$", "");
+                }
+                double val = Convert.ToDouble(text);
+                Properties.Settings.Default.BulkCommonPrice = (float)val;
+                Properties.Settings.Default.Save();
+                ((TextBox)sender).Text = "$" + text;
+            }
+        }
+
+        private void BulkUncommonTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Return)
+            {
+                string text = ((TextBox)sender).Text;
+                if (text.Contains("$"))
+                {
+                    text = text.Replace("$", "");
+                }
+                double val = Convert.ToDouble(text);
+                Properties.Settings.Default.BulkUncommonPrice = (float)val;
+                Properties.Settings.Default.Save();
+                ((TextBox)sender).Text = "$" + text;
+            }
+        }
     }
 }

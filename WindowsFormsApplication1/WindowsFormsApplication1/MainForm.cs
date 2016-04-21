@@ -617,8 +617,8 @@ namespace DigitalInventory
         /// <param name="e"></param>
         private void pricingRulesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PricingRulesForm form = new PricingRulesForm();
-            form.ShowDialog(this);
+            //PricingRulesForm form = new PricingRulesForm();
+            //form.ShowDialog(this);
         }
 
         /// <summary>
@@ -666,5 +666,10 @@ namespace DigitalInventory
             }
         }
 
+        private void settingsMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingsForm form = new SettingsForm();
+            form.ShowDialog(this);
+        }
     }
 }

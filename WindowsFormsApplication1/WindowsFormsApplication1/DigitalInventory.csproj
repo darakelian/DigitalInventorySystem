@@ -67,12 +67,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PricingRulesForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PricingRulesForm.Designer.cs">
-      <DependentUpon>PricingRulesForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -106,9 +100,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PricingRulesForm.resx">
-      <DependentUpon>PricingRulesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

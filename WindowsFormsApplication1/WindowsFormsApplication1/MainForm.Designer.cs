@@ -67,8 +67,6 @@
             this.toTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toCSVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.shopInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pricingRulesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.inventoryTableAdapter = new DigitalInventory.InventoryDataSetTableAdapters.InventoryTableAdapter();
             this.tableAdapterManager = new DigitalInventory.InventoryDataSetTableAdapters.TableAdapterManager();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -278,7 +276,7 @@
             this.removeToolStripMenuItem,
             this.showOnTCGPlayerToolStripMenuItem});
             this.RowRightClick.Name = "RowRightClick";
-            this.RowRightClick.Size = new System.Drawing.Size(178, 70);
+            this.RowRightClick.Size = new System.Drawing.Size(178, 48);
             // 
             // removeToolStripMenuItem
             // 
@@ -467,26 +465,10 @@
             // 
             // settingsMenuItem
             // 
-            this.settingsMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.shopInformationToolStripMenuItem,
-            this.pricingRulesToolStripMenuItem});
             this.settingsMenuItem.Name = "settingsMenuItem";
             this.settingsMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsMenuItem.Text = "Settings";
-            // 
-            // shopInformationToolStripMenuItem
-            // 
-            this.shopInformationToolStripMenuItem.Name = "shopInformationToolStripMenuItem";
-            this.shopInformationToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-            this.shopInformationToolStripMenuItem.Text = "General";
-            this.shopInformationToolStripMenuItem.Click += new System.EventHandler(this.shopInformationToolStripMenuItem_Click);
-            // 
-            // pricingRulesToolStripMenuItem
-            // 
-            this.pricingRulesToolStripMenuItem.Name = "pricingRulesToolStripMenuItem";
-            this.pricingRulesToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-            this.pricingRulesToolStripMenuItem.Text = "Pricing Rules";
-            this.pricingRulesToolStripMenuItem.Click += new System.EventHandler(this.pricingRulesToolStripMenuItem_Click);
+            this.settingsMenuItem.Click += new System.EventHandler(this.settingsMenuItem_Click);
             // 
             // inventoryTableAdapter
             // 
@@ -549,8 +531,6 @@
         private System.Windows.Forms.ToolStripMenuItem toClipboardToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toTextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toCSVToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem shopInformationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem pricingRulesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem textImportMenuItem;
         public System.Windows.Forms.Label nameLabel;
         private InventoryDataSet inventoryDataSet;
