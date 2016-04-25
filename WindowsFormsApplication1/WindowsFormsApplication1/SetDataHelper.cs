@@ -9,19 +9,19 @@ using System.Windows.Forms;
 
 namespace DigitalInventory
 {
-    class SetDataHelper
+    public class SetDataHelper
     {
-        private HashSet<string> cardHash;
-        private Dictionary<string, object[]> setDictionary;
-        private Dictionary<string, int> gathererIdsDictionary;
-        private Dictionary<string, string> rarityDictionary;
-        private AutoCompleteStringCollection acsc;
+        private static HashSet<string> cardHash;
+        private static Dictionary<string, object[]> setDictionary;
+        private static Dictionary<string, int> gathererIdsDictionary;
+        private static Dictionary<string, string> rarityDictionary;
+        private static AutoCompleteStringCollection acsc;
 
         /// <summary>
         /// Loads all pertinent set information from the JSON file. Still need to
         /// figure out why the program takes up so much RAM.
         /// </summary>
-        public SetDataHelper()
+        public static void Load()
         {
             //Load set data
             using (var stream = new MemoryStream(Properties.Resources.AllSetsArray))
@@ -77,7 +77,7 @@ namespace DigitalInventory
         /// </summary>
         /// <param name="card">Name of the card being checked</param>
         /// <returns>True if the card hash has the card</returns>
-        public bool CardExists(string card)
+        public static bool CardExists(string card)
         {
             return cardHash.Contains(card);
         }
@@ -88,7 +88,7 @@ namespace DigitalInventory
         /// <param name="name">Name of the card being checked</param>
         /// <param name="code">Code of the set being checked</param>
         /// <returns>True if the card is in the set</returns>
-        public bool CardInSet(string name, string code)
+        public static bool CardInSet(string name, string code)
         {
             string[] set = SetForCode(code);
             if (set == null)
@@ -111,7 +111,7 @@ namespace DigitalInventory
         /// </summary>
         /// <param name="code"></param>
         /// <returns>Cards in the set provided by the code</returns>
-        public string[] SetForCode(string code)
+        public static string[] SetForCode(string code)
         {
             try
             {
@@ -123,7 +123,7 @@ namespace DigitalInventory
             }
         }
 
-        public string SetNameForCode(string code)
+        public static string SetNameForCode(string code)
         {
             try
             {
@@ -142,7 +142,7 @@ namespace DigitalInventory
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string DefaultSet(string name)
+        public static string DefaultSet(string name)
         {
             string[] sets = setDictionary.Keys.ToArray();
             foreach (string set in sets)
@@ -155,7 +155,7 @@ namespace DigitalInventory
             return "LEA";
         }
 
-        public int GathererIdForCard(string card, string set)
+        public static int GathererIdForCard(string card, string set)
         {
             if (set == null)
             {
@@ -177,7 +177,7 @@ namespace DigitalInventory
         /// </summary>
         /// <param name="card">Name of card being priced</param>
         /// <returns>Float value of card's price</returns>
-        public float GetPrice(string card)
+        public static float GetPrice(string card)
         {
             return GetPrice(card, DefaultSet(card));
         }
@@ -188,7 +188,7 @@ namespace DigitalInventory
         /// <param name="card">Name of card being priced</param>
         /// <param name="set">Set being used for pricing</param>
         /// <returns></returns>
-        public float GetPrice(string card, string set)
+        public static float GetPrice(string card, string set)
         {
             return 2.00F;
         }
@@ -198,7 +198,7 @@ namespace DigitalInventory
         /// </summary>
         /// <param name="card"></param>
         /// <returns>String value of card's rarity</returns>
-        public string GetRarity(string card)
+        public static string GetRarity(string card)
         {
             return GetRarity(card, DefaultSet(card));
         }
@@ -209,7 +209,7 @@ namespace DigitalInventory
         /// <param name="card"></param>
         /// <param name="set"></param>
         /// <returns></returns>
-        public string GetRarity(string card, string set)
+        public static string GetRarity(string card, string set)
         {
             try
             {
@@ -225,7 +225,7 @@ namespace DigitalInventory
         /// Public field accessing the AutoCompleteStringCollection that is created
         /// when the data is loaded.
         /// </summary>
-        public AutoCompleteStringCollection AutoCompleteSource
+        public static AutoCompleteStringCollection AutoCompleteSource
         {
             get
             {
@@ -239,7 +239,7 @@ namespace DigitalInventory
         /// </summary>
         /// <param name="longCondition"></param>
         /// <returns></returns>
-        public string ShortenCondition(string longCondition)
+        public static string ShortenCondition(string longCondition)
         {
             if (longCondition.Equals("heavily played"))
             {
@@ -259,7 +259,7 @@ namespace DigitalInventory
             }
         }
 
-        public string CreateTCGPlayerURL(string card, string set)
+        public static string CreateTCGPlayerURL(string card, string set)
         {
             string name = card.ToLower().Replace(" ", "-");
             string longSet = SetNameForCode(set).ToLower().Replace(" ", "-");

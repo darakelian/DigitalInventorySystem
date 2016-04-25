@@ -57,6 +57,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newTradeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clipboardImportMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fromFilecsvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,6 +70,7 @@
             this.settingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.inventoryTableAdapter = new DigitalInventory.InventoryDataSetTableAdapters.InventoryTableAdapter();
             this.tableAdapterManager = new DigitalInventory.InventoryDataSetTableAdapters.TableAdapterManager();
+            this.addToTradeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -274,9 +276,10 @@
             // 
             this.RowRightClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.removeToolStripMenuItem,
-            this.showOnTCGPlayerToolStripMenuItem});
+            this.showOnTCGPlayerToolStripMenuItem,
+            this.addToTradeToolStripMenuItem});
             this.RowRightClick.Name = "RowRightClick";
-            this.RowRightClick.Size = new System.Drawing.Size(178, 48);
+            this.RowRightClick.Size = new System.Drawing.Size(178, 92);
             // 
             // removeToolStripMenuItem
             // 
@@ -382,7 +385,8 @@
             // fileMenuItem
             // 
             this.fileMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveToolStripMenuItem});
+            this.saveToolStripMenuItem,
+            this.newTradeToolStripMenuItem});
             this.fileMenuItem.Name = "fileMenuItem";
             this.fileMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileMenuItem.Text = "File";
@@ -390,9 +394,16 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
+            // newTradeToolStripMenuItem
+            // 
+            this.newTradeToolStripMenuItem.Name = "newTradeToolStripMenuItem";
+            this.newTradeToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.newTradeToolStripMenuItem.Text = "New Trade";
+            this.newTradeToolStripMenuItem.Click += new System.EventHandler(this.newTradeToolStripMenuItem_Click);
             // 
             // importMenuItem
             // 
@@ -480,6 +491,13 @@
             this.tableAdapterManager.InventoryTableAdapter = this.inventoryTableAdapter;
             this.tableAdapterManager.UpdateOrder = DigitalInventory.InventoryDataSetTableAdapters.TableAdapterManager.UpdateOrderOption.InsertUpdateDelete;
             // 
+            // addToTradeToolStripMenuItem
+            // 
+            this.addToTradeToolStripMenuItem.Name = "addToTradeToolStripMenuItem";
+            this.addToTradeToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.addToTradeToolStripMenuItem.Text = "Add to Trade";
+            this.addToTradeToolStripMenuItem.Click += new System.EventHandler(this.addToTradeToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -553,6 +571,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Foil;
         private System.Windows.Forms.ToolStripMenuItem showOnTCGPlayerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newTradeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addToTradeToolStripMenuItem;
     }
 }
 
