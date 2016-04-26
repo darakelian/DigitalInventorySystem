@@ -30,6 +30,7 @@ namespace DigitalInventory
             {
                 CardListItem item = new CardListItem(name, set, quantity);
                 dataGridView1.Rows.Add(item);
+                dataGridView1.ClearSelection();
             }
         }
 
@@ -43,12 +44,14 @@ namespace DigitalInventory
             {
                 CardListItem item = new CardListItem(name, set, quantity);
                 dataGridView2.Rows.Add(item);
+                dataGridView2.ClearSelection();
             }
         }
 
         public void AddCard(CardListItem item)
         {
-            dataGridView1.Rows.Add(item.ToString());
+            dataGridView1.Rows.Add(item);
+            dataGridView1.ClearSelection();
             Console.WriteLine("Added card from existing inventory");
         }
 
@@ -69,6 +72,7 @@ namespace DigitalInventory
                 DataGridViewRow rowCopy = selectedRow;
                 dataGridView1.Rows.Remove(selectedRow);
                 dataGridView2.Rows.Add(rowCopy);
+                dataGridView2.ClearSelection();
             }
         }
 
@@ -89,6 +93,7 @@ namespace DigitalInventory
                 DataGridViewRow rowCopy = selectedRow;
                 dataGridView2.Rows.Remove(selectedRow);
                 dataGridView1.Rows.Add(rowCopy);
+                dataGridView1.ClearSelection();
             }
         }
 

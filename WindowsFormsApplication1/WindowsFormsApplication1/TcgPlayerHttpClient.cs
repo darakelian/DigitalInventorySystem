@@ -75,7 +75,7 @@ namespace DigitalInventory
                             data = readStream.ReadToEnd();
                         }
                     }
-                    HtmlAgilityPack.HtmlDocument htmlDoc = new HtmlAgilityPack.HtmlDocument();
+                    /*HtmlAgilityPack.HtmlDocument htmlDoc = new HtmlAgilityPack.HtmlDocument();
                     htmlDoc.LoadHtml(data);
                     if (htmlDoc.ParseErrors != null && htmlDoc.ParseErrors.Count() > 0)
                     {
@@ -105,7 +105,7 @@ namespace DigitalInventory
                                 }
                             }
                         }
-                    }
+                    }*/
                 }
                 Console.WriteLine(prices[0] + " " + prices[1]);
             }
