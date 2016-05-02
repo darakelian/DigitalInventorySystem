@@ -67,7 +67,7 @@ namespace DigitalInventory
         /// <param name="condition">Condition of card being added</param>
         private void AddCardToDatabase(string cardname, string set, int quantity, string condition, bool foil)
         {
-            float price = SetDataHelper.GetPrice(cardname);
+            float price = TcgPlayerHttpClient.RetrievePrice(cardname, set, foil);
             //Check if database already contains a card, set, condition pair
             IEnumerable<InventoryDataSet.InventoryRow> rowsQuery =
                 from row in inventoryDataSet.Inventory.AsEnumerable()
@@ -194,7 +194,7 @@ namespace DigitalInventory
                 int quantity = Convert.ToInt32(row.Cells[3].Value.ToString().Trim());
                 string condition = row.Cells[4].Value.ToString().Trim();
                 string price = row.Cells[5].Value.ToString().Trim();
-                TcgPlayerHttpClient.RetrievePrice(cardName, set);
+                bool foil = Convert.ToBoolean(row.Cells[6].Value);
                 string url = String.Format("http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={0}&type=card",
                     SetDataHelper.GathererIdForCard(cardName, set));
                 //Load from wizards site and if the image isn't downloaded, download it
@@ -230,6 +230,7 @@ namespace DigitalInventory
                         pictureBox1.Load(destPath);
                     }
                 }
+                price = "$" + TcgPlayerHttpClient.RetrievePrice(cardName, set, foil);
                 nameLabel.Text = cardName;
                 conditionLabel.Text = conditionLabel.Text.Split(':')[0] + ": " + condition;
                 quantityLabel2.Text = quantityLabel2.Text.Split(':')[0] + ": " + quantity;

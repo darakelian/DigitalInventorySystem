@@ -24,5 +24,37 @@ namespace DigitalInventory
         {
             return card + "\n" + set + "    " + Convert.ToString(quantity);
         }
+
+        public int Quantity
+        {
+            get
+            {
+                return quantity;
+            }
+            set
+            {
+                quantity = value;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return card;
+            }
+        }
+
+        public string SetCode
+        {
+            get
+            {
+                return set;
+            }
+            set
+            {
+                set = Convert.ToString(value);
+            }
+        }
     }
 }

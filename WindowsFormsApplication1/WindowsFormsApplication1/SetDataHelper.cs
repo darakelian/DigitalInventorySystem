@@ -171,28 +171,6 @@ namespace DigitalInventory
             }
         }
 
-
-        /// <summary>
-        /// Gets the price of a card from its default set using TCGPlayer data.
-        /// </summary>
-        /// <param name="card">Name of card being priced</param>
-        /// <returns>Float value of card's price</returns>
-        public static float GetPrice(string card)
-        {
-            return GetPrice(card, DefaultSet(card));
-        }
-
-        /// <summary>
-        /// Gets the price of a card from a specified set using TCGPlayer data.
-        /// </summary>
-        /// <param name="card">Name of card being priced</param>
-        /// <param name="set">Set being used for pricing</param>
-        /// <returns></returns>
-        public static float GetPrice(string card, string set)
-        {
-            return 2.00F;
-        }
-
         /// <summary>
         /// Gets the rarity of a card from it's default set.
         /// </summary>
@@ -261,9 +239,41 @@ namespace DigitalInventory
 
         public static string CreateTCGPlayerURL(string card, string set)
         {
-            string name = card.ToLower().Replace(" ", "-");
-            string longSet = SetNameForCode(set).ToLower().Replace(" ", "-");
-            return String.Format("http://shop.tcgplayer.com/magic/{0}/{1}", longSet, name);
+            string longSet = TCGSetForCode(set);
+            return String.Format("http://partner.tcgplayer.com/x3/phl.asmx/p?pk={0}&s={1}&p={2}", TcgPlayerHttpClient.APIKEY, longSet, card);
+        }
+
+        public static string TCGSetForCode(string code)
+        {
+            switch (code)
+            {
+                case "LEA":
+                    return "Alpha Edition";
+                case "LEB":
+                    return "Beta Edition";
+                case "MM2":
+                    return "Modern Masters 2015";
+                case "9ED":
+                    return "9th Edition";
+                case "8ED":
+                    return "8th Edition";
+                default:
+                    return SetNameForCode(code);
+            }
+        }
+
+        public static string[] AllSetsForCard(string card)
+        {
+            List<string> setList = new List<string>();
+            string[] sets = setDictionary.Keys.ToArray();
+            foreach (string set in sets)
+            {
+                if (CardInSet(card, set))
+                {
+                    setList.Add(set);
+                }
+            }
+            return setList.ToArray();
         }
 
     }

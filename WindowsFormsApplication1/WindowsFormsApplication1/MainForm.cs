@@ -84,4 +84,12 @@ namespace DigitalInventory
         }
 
     }
+
+    public class PriceFetcherWorker
+    {
+        public void UpdatePrices()
+        {
+
+        }
+    }
 }

@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.cardAddingTextBox = new System.Windows.Forms.TextBox();
             this.addCardButton = new System.Windows.Forms.Button();
             this.toPartnerButton = new System.Windows.Forms.Button();
@@ -40,8 +41,10 @@
             this.addPartnerCardButton = new System.Windows.Forms.Button();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.quantityToAdd = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.quantityToAdd)).BeginInit();
             this.SuspendLayout();
             // 
             // cardAddingTextBox
@@ -104,16 +107,19 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle1;
-            this.dataGridView1.RowTemplate.ReadOnly = true;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(175, 358);
             this.dataGridView1.TabIndex = 6;
+            this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.beginEditValue);
+            this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
             // cardColumn
             // 
             this.cardColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.cardColumn.DefaultCellStyle = dataGridViewCellStyle1;
             this.cardColumn.HeaderText = "Card";
             this.cardColumn.Name = "cardColumn";
             this.cardColumn.ReadOnly = true;
@@ -140,12 +146,14 @@
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersVisible = false;
             this.dataGridView2.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridView2.RowTemplate.ReadOnly = true;
             this.dataGridView2.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView2.Size = new System.Drawing.Size(175, 358);
             this.dataGridView2.TabIndex = 9;
+            this.dataGridView2.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.beginEditValue);
+            this.dataGridView2.SelectionChanged += new System.EventHandler(this.dataGridView2_SelectionChanged);
             // 
             // dataGridViewTextBoxColumn1
             // 
@@ -154,11 +162,29 @@
             this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             this.dataGridViewTextBoxColumn1.ReadOnly = true;
             // 
+            // quantityToAdd
+            // 
+            this.quantityToAdd.Location = new System.Drawing.Point(194, 13);
+            this.quantityToAdd.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.quantityToAdd.Name = "quantityToAdd";
+            this.quantityToAdd.Size = new System.Drawing.Size(57, 20);
+            this.quantityToAdd.TabIndex = 10;
+            this.quantityToAdd.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
             // TradeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(472, 446);
+            this.Controls.Add(this.quantityToAdd);
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.addPartnerCardButton);
             this.Controls.Add(this.dataGridView1);
@@ -173,6 +199,7 @@
             this.Text = "TradeForm";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.quantityToAdd)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -186,9 +213,10 @@
         private System.Windows.Forms.Button toUserButton;
         private System.Windows.Forms.Button removeCardButton;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cardColumn;
         private System.Windows.Forms.Button addPartnerCardButton;
         private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private System.Windows.Forms.NumericUpDown quantityToAdd;
+        private System.Windows.Forms.DataGridViewTextBoxColumn cardColumn;
     }
 }

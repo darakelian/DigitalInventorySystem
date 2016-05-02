@@ -48,10 +48,15 @@ namespace DigitalInventory
             }
         }
 
+        /// <summary>
+        /// Adds a card to the trade from the existing inventory.
+        /// </summary>
+        /// <param name="item"></param>
         public void AddCard(CardListItem item)
         {
             dataGridView1.Rows.Add(item);
             dataGridView1.ClearSelection();
+            this.quantityToAdd.Focus();
             Console.WriteLine("Added card from existing inventory");
         }
 
@@ -99,8 +104,52 @@ namespace DigitalInventory
 
         private void removeCardButton_Click(object sender, EventArgs e)
         {
+            if (dataGridView1.SelectedRows.Count >= 1)
+            {
+                DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+                dataGridView1.Rows.Remove(selectedRow);
+            }
+            if (dataGridView2.SelectedRows.Count >= 1)
+            {
+                DataGridViewRow selectedRow = dataGridView2.SelectedRows[0];
+                dataGridView2.Rows.Remove(selectedRow);
+            }
+        }
 
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView2.SelectedRows.Count >= 1)
+            {
+                dataGridView2.ClearSelection();
+            }
+        }
+
+        private void dataGridView2_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count >= 1)
+            {
+                dataGridView1.ClearSelection();
+            }
+        }
+
+        private void beginEditValue(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView view = sender as DataGridView;
+            DataGridViewRow row = view.Rows[e.RowIndex];
+            Console.WriteLine(row.Cells[0].Value);
+            try
+            {
+                DataGridViewCell cell = row.Cells[0];
+                CardListItem cardItem = (CardListItem)row.Cells[0].Value;
+                TradeEditForm editForm = new TradeEditForm(cardItem);
+                editForm.ShowDialog(this);
+            }
+            catch (InvalidCastException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
     }
+
 }
