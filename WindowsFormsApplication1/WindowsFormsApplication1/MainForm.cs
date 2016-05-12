@@ -70,6 +70,8 @@ namespace DigitalInventory
                     e.Cancel = true;
                 }
             }
+            //Serialize price data if it has changed.
+            TcgPlayerHttpClient.SerializeCardPrices();
         }
 
         /// <summary>

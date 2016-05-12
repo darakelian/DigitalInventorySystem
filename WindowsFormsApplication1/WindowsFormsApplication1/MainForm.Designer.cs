@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.priceLabel = new System.Windows.Forms.Label();
             this.quantityLabel2 = new System.Windows.Forms.Label();
@@ -47,6 +48,7 @@
             this.RowRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showOnTCGPlayerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addToTradeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.inventoryBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.inventoryDataSet = new DigitalInventory.InventoryDataSet();
             this.quantitySelection = new System.Windows.Forms.NumericUpDown();
@@ -70,7 +72,6 @@
             this.settingsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.inventoryTableAdapter = new DigitalInventory.InventoryDataSetTableAdapters.InventoryTableAdapter();
             this.tableAdapterManager = new DigitalInventory.InventoryDataSetTableAdapters.TableAdapterManager();
-            this.addToTradeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -200,6 +201,15 @@
             this.Foil});
             this.inventoryDataGridView.ContextMenuStrip = this.RowRightClick;
             this.inventoryDataGridView.DataSource = this.inventoryBindingSource;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.Format = "0.00";
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.inventoryDataGridView.DefaultCellStyle = dataGridViewCellStyle1;
             this.inventoryDataGridView.Location = new System.Drawing.Point(17, 67);
             this.inventoryDataGridView.MultiSelect = false;
             this.inventoryDataGridView.Name = "inventoryDataGridView";
@@ -279,7 +289,7 @@
             this.showOnTCGPlayerToolStripMenuItem,
             this.addToTradeToolStripMenuItem});
             this.RowRightClick.Name = "RowRightClick";
-            this.RowRightClick.Size = new System.Drawing.Size(178, 92);
+            this.RowRightClick.Size = new System.Drawing.Size(178, 70);
             // 
             // removeToolStripMenuItem
             // 
@@ -294,6 +304,13 @@
             this.showOnTCGPlayerToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
             this.showOnTCGPlayerToolStripMenuItem.Text = "Show on TCGPlayer";
             this.showOnTCGPlayerToolStripMenuItem.Click += new System.EventHandler(this.showOnTCGPlayerToolStripMenuItem_Click);
+            // 
+            // addToTradeToolStripMenuItem
+            // 
+            this.addToTradeToolStripMenuItem.Name = "addToTradeToolStripMenuItem";
+            this.addToTradeToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.addToTradeToolStripMenuItem.Text = "Add to Trade";
+            this.addToTradeToolStripMenuItem.Click += new System.EventHandler(this.addToTradeToolStripMenuItem_Click);
             // 
             // inventoryBindingSource
             // 
@@ -490,13 +507,6 @@
             this.tableAdapterManager.BackupDataSetBeforeUpdate = false;
             this.tableAdapterManager.InventoryTableAdapter = this.inventoryTableAdapter;
             this.tableAdapterManager.UpdateOrder = DigitalInventory.InventoryDataSetTableAdapters.TableAdapterManager.UpdateOrderOption.InsertUpdateDelete;
-            // 
-            // addToTradeToolStripMenuItem
-            // 
-            this.addToTradeToolStripMenuItem.Name = "addToTradeToolStripMenuItem";
-            this.addToTradeToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.addToTradeToolStripMenuItem.Text = "Add to Trade";
-            this.addToTradeToolStripMenuItem.Click += new System.EventHandler(this.addToTradeToolStripMenuItem_Click);
             // 
             // MainForm
             // 

@@ -15,9 +15,9 @@ namespace DigitalInventory
 {
     public class TcgPlayerHttpClient
     {
-        public static Dictionary<Price, DateTime> cachedPriceTimestamps = new Dictionary<Price, DateTime>();
-        public static Dictionary<string, Price> cachedPrices = new Dictionary<string, Price>();
+        public static Dictionary<Price, Price> cachedPrices = new Dictionary<Price, Price>();
         public const string APIKEY = "MTGDIGITALBINDER";
+        private static bool pricesChanged = false;
 
         /// <summary>
         /// Returns the median price of a card from a given set.
@@ -42,18 +42,11 @@ namespace DigitalInventory
         /// <returns></returns>
         public static float RetrievePrice(string cardName, string setCode, bool foil)
         {
-            string key = cardName + "-" + setCode;
-            if (cachedPrices.ContainsKey(key))
+            Price dummyPrice = new Price(cardName, setCode);
+            if (cachedPrices.ContainsKey(dummyPrice))
             {
-                Price cachedPrice = cachedPrices[key];
-                DateTime lastTime = cachedPriceTimestamps[cachedPrice];
-                DateTime currentTime = DateTime.Now;
-                TimeSpan duration = currentTime - lastTime;
-                if (duration.Hours >= 24)
-                {
-                    return RetrieveTCGPrice(cardName, setCode, foil);
-                }
-                return foil ? cachedPrice.Foil : cachedPrice.Med != 0 ? cachedPrice.Med : cachedPrice.Foil;
+                Price realPrice = cachedPrices[dummyPrice];
+                return foil ? realPrice.Foil : realPrice.Med != 0 ? realPrice.Med : realPrice.Foil;
             }
             return RetrieveTCGPrice(cardName, setCode, foil);
         }
@@ -81,12 +74,25 @@ namespace DigitalInventory
                 }
             }
             Price price = new Price(cardName, setCode, prices[1], prices[2], prices[0], prices[3]);
-            cachedPrices[cardName + "-" + setCode] = price;
-            cachedPriceTimestamps[price] = DateTime.Now;
             //If not foil (say user forget to specify) but the card only exists
             //in foil, return the foil price.
+            cachedPrices[price] = price;
             Console.WriteLine("Cached price");
+            pricesChanged = true;
             return foil ? price.Foil : price.Med != 0 ? price.Med : price.Foil;
+        }
+
+        public static void SerializeCardPrices()
+        {
+            if (pricesChanged)
+            {
+
+            }
+        }
+
+        public static void DeserializeCardPrices()
+        {
+
         }
     }
 }

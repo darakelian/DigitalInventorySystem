@@ -13,6 +13,8 @@ namespace DigitalInventory
 
         private float low, med, high, foil;
 
+        private DateTime timeRetrieved;
+
         /// <summary>
         /// Use this constructor to create a Price object for searching existing
         /// prices.
@@ -33,6 +35,7 @@ namespace DigitalInventory
             this.med = med;
             this.high = high;
             this.foil = foil;
+            this.timeRetrieved = DateTime.Now;
         }
 
         public string Name
